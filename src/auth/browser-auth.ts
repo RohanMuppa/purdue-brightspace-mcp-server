@@ -20,25 +20,15 @@ export class BrowserAuth {
     });
   }
 
-  /**
-   * Authenticate to Purdue Brightspace using browser automation.
-   * Manages browser lifecycle, invokes SSO login flow if needed, and captures Bearer token via network interception.
-   *
-   * @returns TokenData with captured Bearer token and expiration info
-   */
   async authenticate(): Promise<TokenData> {
     let context: BrowserContext | null = null;
 
     try {
       log("INFO", "Starting browser authentication");
 
-      // Ensure session directory exists
       await fs.mkdir(this.config.sessionDir, { recursive: true });
 
-      // Launch persistent browser context for session reuse
       const browserDataDir = path.join(this.config.sessionDir, "browser-data");
-      log("DEBUG", `Launching browser with persistent context at ${browserDataDir}`);
-
       context = await chromium.launchPersistentContext(browserDataDir, {
         headless: this.config.headless,
         viewport: { width: 1280, height: 720 },
@@ -47,21 +37,83 @@ export class BrowserAuth {
 
       log("INFO", "Browser context launched");
 
-      // Get or create page
       const page = context.pages()[0] || (await context.newPage());
 
-      // CRITICAL: Set up token interception BEFORE navigation to avoid race condition
+      // CRITICAL: Set up token interception BEFORE navigation
       const tokenPromise = this.setupTokenInterception(page);
 
-      // Check if already authenticated or need to login
-      await this.navigateAndLogin(page);
+      // Navigate and login if needed
+      const alreadyAuthenticated = await this.navigateAndLogin(page);
 
-      // Await token from interception
+      // If already authenticated via cookies, Bearer tokens won't appear in
+      // normal page requests. Try strategies to extract a usable token.
+      if (alreadyAuthenticated) {
+        log("INFO", "Session cookies active — trying to extract API token");
+
+        // Strategy 1: Navigate to API endpoint to trigger Bearer-bearing requests
+        try {
+          log("DEBUG", "Navigating to API endpoint to trigger token capture");
+          await page.goto(
+            `${this.config.baseUrl}/d2l/api/lp/1.57/users/whoami`,
+            { waitUntil: "load", timeout: 15000 }
+          );
+        } catch {
+          log("DEBUG", "Direct API navigation did not produce Bearer token");
+        }
+
+        // Strategy 2: Try extracting XSRF token from D2L's JavaScript context
+        const xsrfToken = await this.extractXsrfToken(page);
+        if (xsrfToken) {
+          log("INFO", "Extracted XSRF token from page context");
+          const now = Date.now();
+          const tokenData: TokenData = {
+            accessToken: xsrfToken,
+            capturedAt: now,
+            expiresAt: now + this.config.tokenTtl * 1000,
+            source: "browser",
+          };
+          await this.saveStorageState(context);
+          return tokenData;
+        }
+
+        // Strategy 3: Extract session cookies for cookie-based API auth
+        const cookieToken = await this.extractCookieToken(context);
+        if (cookieToken) {
+          log("INFO", "Extracted session cookie for API auth");
+          const now = Date.now();
+          const tokenData: TokenData = {
+            accessToken: cookieToken,
+            capturedAt: now,
+            expiresAt: now + this.config.tokenTtl * 1000,
+            source: "browser",
+          };
+          await this.saveStorageState(context);
+          return tokenData;
+        }
+
+        // Strategy 4: Clear cookies and force full re-login through SSO
+        log("WARN", "Could not extract token from existing session, forcing re-login");
+        await context.clearCookies();
+        const freshTokenPromise = this.setupTokenInterception(page);
+        await this.navigateAndLogin(page);
+        const accessToken = await freshTokenPromise;
+        log("INFO", "Bearer token captured after forced re-login");
+        const now = Date.now();
+        const tokenData: TokenData = {
+          accessToken,
+          capturedAt: now,
+          expiresAt: now + this.config.tokenTtl * 1000,
+          source: "browser",
+        };
+        await this.saveStorageState(context);
+        return tokenData;
+      }
+
+      // Normal flow: token captured during SSO redirect
       log("INFO", "Waiting for Bearer token from network interception");
       const accessToken = await tokenPromise;
       log("INFO", "Bearer token captured successfully");
 
-      // Construct TokenData
       const now = Date.now();
       const tokenData: TokenData = {
         accessToken,
@@ -70,14 +122,7 @@ export class BrowserAuth {
         source: "browser",
       };
 
-      // Save browser storage state as fallback for cookie persistence
-      const storageStatePath = path.join(
-        this.config.sessionDir,
-        "storage-state.json"
-      );
-      log("DEBUG", `Saving storage state to ${storageStatePath}`);
-      await context.storageState({ path: storageStatePath });
-
+      await this.saveStorageState(context);
       log("INFO", "Authentication complete");
       return tokenData;
     } catch (error) {
@@ -88,7 +133,6 @@ export class BrowserAuth {
         error as Error
       );
     } finally {
-      // Always close browser context
       if (context) {
         log("DEBUG", "Closing browser context");
         await context.close();
@@ -99,9 +143,6 @@ export class BrowserAuth {
   /**
    * Set up passive network request listener to capture Bearer token.
    * MUST be called BEFORE page.goto() to avoid race condition.
-   *
-   * @param page - Playwright page instance
-   * @returns Promise that resolves with Bearer token string
    */
   private setupTokenInterception(page: Page): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -114,12 +155,11 @@ export class BrowserAuth {
         );
       }, 120000);
 
-      // Passive listener for requests (not page.route which is active interception)
       page.on("request", (request) => {
         const url = request.url();
 
-        // Look for D2L API requests
-        if (url.includes("/d2l/api/")) {
+        // Look for any request with a Bearer token
+        if (url.includes("/d2l/")) {
           const authHeader = request.headers()["authorization"];
 
           if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -136,19 +176,17 @@ export class BrowserAuth {
   }
 
   /**
-   * Navigate to Brightspace home and invoke SSO login if needed.
-   *
-   * @param page - Playwright page instance
+   * Navigate to Brightspace and login if needed.
+   * Returns true if already authenticated (cookies valid), false if SSO login was performed.
    */
-  private async navigateAndLogin(page: Page): Promise<void> {
+  private async navigateAndLogin(page: Page): Promise<boolean> {
     try {
       log("INFO", `Navigating to ${this.config.baseUrl}/d2l/home`);
       await page.goto(`${this.config.baseUrl}/d2l/home`, {
-        waitUntil: "networkidle",
+        waitUntil: "domcontentloaded",
         timeout: 30000,
       });
 
-      // Check if we're on the login page or already authenticated
       const currentUrl = page.url();
       log("DEBUG", `Current URL after navigation: ${currentUrl}`);
 
@@ -164,25 +202,141 @@ export class BrowserAuth {
         const loginSuccess = await this.ssoFlow.login(page);
 
         if (!loginSuccess) {
-          throw new BrowserAuthError(
-            "SSO login flow failed",
-            "sso_login"
-          );
+          throw new BrowserAuthError("SSO login flow failed", "sso_login");
         }
-      } else {
-        log("INFO", "Already authenticated - skipping SSO login");
+
+        await page.waitForLoadState("networkidle", { timeout: 30000 });
+        return false;
       }
 
-      // At this point, we should be on Brightspace home
-      // The page will make API requests which our token interceptor will catch
-      log("DEBUG", "Waiting for page to make API requests");
+      log("INFO", "Already authenticated - skipping SSO login");
       await page.waitForLoadState("networkidle", { timeout: 30000 });
+      return true;
     } catch (error) {
+      if (error instanceof BrowserAuthError) throw error;
       throw new BrowserAuthError(
         "Failed to navigate and login",
         "navigate_login",
         error as Error
       );
+    }
+  }
+
+  /**
+   * Try to extract XSRF/API token from D2L's JavaScript context.
+   * Brightspace stores auth tokens in the page's JS globals.
+   */
+  private async extractXsrfToken(page: Page): Promise<string | null> {
+    try {
+      // Navigate back to homepage where D2L JS context is available
+      const currentUrl = page.url();
+      if (!currentUrl.includes("/d2l/home")) {
+        await page.goto(`${this.config.baseUrl}/d2l/home`, {
+          waitUntil: "networkidle",
+          timeout: 15000,
+        });
+      }
+
+      const token = await page.evaluate(() => {
+        // D2L stores XSRF token in various places
+        // Try common D2L token locations
+        const d2l = (window as unknown as Record<string, unknown>).D2L as
+          | Record<string, unknown>
+          | undefined;
+
+        if (d2l) {
+          // Try D2L.LP.Web.Authentication.Xsrf.GetXsrfToken()
+          try {
+            const lp = d2l.LP as Record<string, unknown> | undefined;
+            const web = lp?.Web as Record<string, unknown> | undefined;
+            const auth = web?.Authentication as
+              | Record<string, unknown>
+              | undefined;
+            const xsrf = auth?.Xsrf as Record<string, unknown> | undefined;
+            const getToken = xsrf?.GetXsrfToken as (() => string) | undefined;
+            if (getToken) return getToken();
+          } catch {
+            // Not available
+          }
+        }
+
+        // Try extracting from meta tags or script data
+        const metaToken = document.querySelector(
+          'meta[name="d2l-xsrf-token"]'
+        );
+        if (metaToken) return metaToken.getAttribute("content");
+
+        // Try extracting from local storage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes("token") || key.includes("Token"))) {
+            const val = localStorage.getItem(key);
+            if (val && val.length > 20) return val;
+          }
+        }
+
+        return null;
+      });
+
+      if (token) {
+        log("DEBUG", "Found token via page JavaScript context");
+        return token;
+      }
+
+      return null;
+    } catch (error) {
+      log("DEBUG", "XSRF token extraction failed", error);
+      return null;
+    }
+  }
+
+  /**
+   * Extract D2L session cookies that can be used for cookie-based API auth.
+   * Constructs a cookie header string from d2lSessionVal and d2lSecureSessionVal.
+   */
+  private async extractCookieToken(
+    context: BrowserContext
+  ): Promise<string | null> {
+    try {
+      const cookies = await context.cookies(this.config.baseUrl);
+      const relevantCookies = cookies.filter(
+        (c) =>
+          c.name === "d2lSessionVal" ||
+          c.name === "d2lSecureSessionVal" ||
+          c.name.startsWith("d2l")
+      );
+
+      if (relevantCookies.length === 0) {
+        log("DEBUG", "No D2L session cookies found");
+        return null;
+      }
+
+      // Build a cookie string for API requests
+      const cookieStr = relevantCookies
+        .map((c) => `${c.name}=${c.value}`)
+        .join("; ");
+
+      log(
+        "DEBUG",
+        `Found ${relevantCookies.length} D2L cookies: ${relevantCookies.map((c) => c.name).join(", ")}`
+      );
+      return `cookie:${cookieStr}`;
+    } catch (error) {
+      log("DEBUG", "Cookie extraction failed", error);
+      return null;
+    }
+  }
+
+  private async saveStorageState(context: BrowserContext): Promise<void> {
+    try {
+      const storageStatePath = path.join(
+        this.config.sessionDir,
+        "storage-state.json"
+      );
+      await context.storageState({ path: storageStatePath });
+      log("DEBUG", `Storage state saved to ${storageStatePath}`);
+    } catch (error) {
+      log("WARN", "Failed to save storage state", error);
     }
   }
 }
