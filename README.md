@@ -1,6 +1,6 @@
 # Purdue Brightspace MCP Server
 
-Access your Purdue Brightspace courses using natural language. Get grades, due dates, announcements, rosters, and more. Works with any MCP client (Claude Desktop, Claude Code, Cursor, etc.).
+Access your Purdue Brightspace courses using natural language. Get grades, due dates, announcements, rosters, and more. Works with any MCP client (Claude Desktop, ChatGPT Desktop, Claude Code, Cursor, etc.).
 
 ## What You Can Do
 
