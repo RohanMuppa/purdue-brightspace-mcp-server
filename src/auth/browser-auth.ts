@@ -94,11 +94,12 @@ export class BrowserAuth {
         // Strategy 4: Clear cookies and force full re-login through SSO
         log("WARN", "Could not extract token from existing session, forcing re-login");
         await context.clearCookies();
-        // Navigate away first to avoid "navigation interrupted" error when
-        // the page is already on /d2l/home and Brightspace starts redirecting
-        await page.goto("about:blank");
-        const freshTokenPromise = this.setupTokenInterception(page);
-        await this.navigateAndLogin(page);
+        // Close the old page and open a fresh one to kill any in-flight
+        // Brightspace redirects that would interrupt our next navigation
+        await page.close();
+        const freshPage = await context.newPage();
+        const freshTokenPromise = this.setupTokenInterception(freshPage);
+        await this.navigateAndLogin(freshPage);
         const accessToken = await freshTokenPromise;
         log("INFO", "Bearer token captured after forced re-login");
         const now = Date.now();
