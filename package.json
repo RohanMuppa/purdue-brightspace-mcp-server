@@ -18,12 +18,17 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
+    "file-type": "^21.3.0",
+    "otpauth": "^9.5.0",
     "playwright": "^1.58.2",
-    "zod": "^4.0.0",
-    "otpauth": "^9.5.0"
+    "sanitize-filename": "^1.6.3",
+    "turndown": "^7.2.2",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@types/sanitize-filename": "^1.1.28",
+    "@types/turndown": "^5.0.6",
     "typescript": "^5.9.0",
     "vitest": "^4.0.0"
   },
