@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { D2LApiClient, DEFAULT_CACHE_TTLS } from "../api/index.js";
 import {
   GetMyCoursesSchema,
-  getMyCoursesInputSchema,
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
@@ -41,7 +40,7 @@ export function registerGetMyCourses(
       title: "Get My Courses",
       description:
         "Fetch your enrolled Brightspace courses with names, codes, and IDs. Use activeOnly to filter to current semester.",
-      inputSchema: getMyCoursesInputSchema as any,
+      inputSchema: GetMyCoursesSchema,
     },
     async (args: any) => {
       try {
