@@ -11,6 +11,7 @@ import {
   registerGetUpcomingDueDates,
   registerGetMyGrades,
   registerGetAnnouncements,
+  registerGetAssignments,
 } from "./tools/index.js";
 
 // CRITICAL: Enable stdout guard IMMEDIATELY to prevent corruption of stdio transport
@@ -96,13 +97,14 @@ async function main(): Promise<void> {
     registerGetUpcomingDueDates(server, apiClient);
     registerGetMyGrades(server, apiClient);
     registerGetAnnouncements(server, apiClient);
-    log("DEBUG", "MCP tools registered (4 core tools)");
+    registerGetAssignments(server, apiClient);
+    log("DEBUG", "MCP tools registered (5 core tools)");
 
     // Connect stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
 
-    log("INFO", "Purdue Brightspace MCP Server running on stdio (5 tools registered)");
+    log("INFO", "Purdue Brightspace MCP Server running on stdio (6 tools registered)");
     log("INFO", "Claude Desktop setup: see claude-desktop-config.example.json in the project root");
   } catch (error) {
     log("ERROR", "MCP Server failed to start", error);
