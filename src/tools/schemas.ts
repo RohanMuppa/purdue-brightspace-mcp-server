@@ -36,6 +36,11 @@ export const GetCourseContentSchema = z.object({
     .describe("Optional filter to narrow results by content type."),
 });
 
+export const GetClasslistEmailsSchema = z.object({
+  courseId: z.number().int().positive()
+    .describe("Course ID to get emails for."),
+});
+
 export const DownloadFileSchema = z.object({
   courseId: z.number().int().positive()
     .describe("Course ID the file belongs to."),
@@ -47,4 +52,13 @@ export const DownloadFileSchema = z.object({
     .describe("Specific file ID within a dropbox submission."),
   downloadPath: z.string().min(1)
     .describe("Absolute path to the directory where the file should be saved."),
+});
+
+export const GetRosterSchema = z.object({
+  courseId: z.number().int().positive()
+    .describe("Course ID to get roster for."),
+  includeStudents: z.boolean().default(false)
+    .describe("Include students in results. Default is instructors and TAs only."),
+  searchTerm: z.string().optional()
+    .describe("Optional search term to filter by name."),
 });
