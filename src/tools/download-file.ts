@@ -25,7 +25,7 @@ export function registerDownloadFile(
     {
       title: "Download File",
       description:
-        "Download a file from course content or assignment submissions to a local directory. Use this when the user wants to download, save, or get a file from Brightspace course content or dropbox submissions.",
+        "Download a file from course content or assignment submissions to a local directory. Use this when the user wants to download, save, or get a file from Brightspace course content or dropbox submissions. IMPORTANT: You MUST ask the user where they want to save the file before calling this tool. Never guess or assume a download directory.",
       inputSchema: DownloadFileSchema,
     },
     async (args: any) => {

@@ -37,6 +37,10 @@ export class BrowserAuth {
 
       log("INFO", "Browser context launched");
 
+      // Load saved storage state if it exists (cookies + localStorage)
+      // This works around Playwright bug #36139 where session cookies don't persist
+      await this.loadStorageState(context);
+
       const page = context.pages()[0] || (await context.newPage());
 
       // CRITICAL: Set up token interception BEFORE navigation
@@ -49,6 +53,21 @@ export class BrowserAuth {
       // normal page requests. Try strategies to extract a usable token.
       if (alreadyAuthenticated) {
         log("INFO", "Session cookies active — trying to extract API token");
+
+        // Strategy 0: Try extracting Bearer token from localStorage (fastest)
+        const localStorageToken = await this.extractLocalStorageToken(page);
+        if (localStorageToken) {
+          log("INFO", "Extracted Bearer token from localStorage");
+          const now = Date.now();
+          const tokenData: TokenData = {
+            accessToken: localStorageToken,
+            capturedAt: now,
+            expiresAt: now + this.config.tokenTtl * 1000,
+            source: "browser",
+          };
+          await this.saveStorageState(context);
+          return tokenData;
+        }
 
         // Strategy 1: Navigate to API endpoint to trigger Bearer-bearing requests
         try {
@@ -227,6 +246,51 @@ export class BrowserAuth {
   }
 
   /**
+   * Try to extract Bearer token from D2L's localStorage.
+   * D2L stores API tokens in localStorage under "D2L.Fetch.Tokens".
+   */
+  private async extractLocalStorageToken(page: Page): Promise<string | null> {
+    try {
+      // Navigate to Brightspace home if not already there
+      const currentUrl = page.url();
+      if (!currentUrl.includes("/d2l/home")) {
+        await page.goto(`${this.config.baseUrl}/d2l/home`, {
+          waitUntil: "networkidle",
+          timeout: 15000,
+        });
+      }
+
+      const token = await page.evaluate(() => {
+        try {
+          const tokensJson = localStorage.getItem("D2L.Fetch.Tokens");
+          if (!tokensJson) return null;
+
+          const tokens = JSON.parse(tokensJson);
+          // Tokens are stored as { "*:*:*": { access_token: "...", expires_at: ... } }
+          const wildcardToken = tokens["*:*:*"];
+          if (wildcardToken && wildcardToken.access_token) {
+            return wildcardToken.access_token;
+          }
+
+          return null;
+        } catch {
+          return null;
+        }
+      });
+
+      if (token) {
+        log("DEBUG", "Found Bearer token in localStorage (D2L.Fetch.Tokens)");
+        return token;
+      }
+
+      return null;
+    } catch (error) {
+      log("DEBUG", "localStorage token extraction failed", error);
+      return null;
+    }
+  }
+
+  /**
    * Try to extract XSRF/API token from D2L's JavaScript context.
    * Brightspace stores auth tokens in the page's JS globals.
    */
@@ -328,6 +392,83 @@ export class BrowserAuth {
     } catch (error) {
       log("DEBUG", "Cookie extraction failed", error);
       return null;
+    }
+  }
+
+  /**
+   * Load previously saved storage state (cookies + localStorage).
+   * Workaround for Playwright bug #36139: session cookies don't persist in persistent context.
+   */
+  private async loadStorageState(context: BrowserContext): Promise<void> {
+    try {
+      const storageStatePath = path.join(
+        this.config.sessionDir,
+        "storage-state.json"
+      );
+
+      // Check if storage state file exists
+      try {
+        await fs.access(storageStatePath);
+      } catch {
+        log("DEBUG", "No existing storage state to load");
+        return;
+      }
+
+      // Read storage state
+      const stateJson = await fs.readFile(storageStatePath, "utf-8");
+      const state = JSON.parse(stateJson) as {
+        cookies: Array<{
+          name: string;
+          value: string;
+          domain: string;
+          path: string;
+          expires: number;
+          httpOnly: boolean;
+          secure: boolean;
+          sameSite: "Strict" | "Lax" | "None";
+        }>;
+        origins: Array<{
+          origin: string;
+          localStorage: Array<{ name: string; value: string }>;
+        }>;
+      };
+
+      // Restore cookies
+      if (state.cookies && state.cookies.length > 0) {
+        await context.addCookies(state.cookies);
+        log(
+          "INFO",
+          `Restored ${state.cookies.length} cookies from storage state`
+        );
+      }
+
+      // Restore localStorage for each origin
+      if (state.origins && state.origins.length > 0) {
+        for (const origin of state.origins) {
+          if (origin.localStorage && origin.localStorage.length > 0) {
+            // Create a temporary page to set localStorage
+            const tempPage = await context.newPage();
+            await tempPage.goto(origin.origin);
+
+            // Set each localStorage item
+            await tempPage.evaluate((items) => {
+              for (const item of items) {
+                localStorage.setItem(item.name, item.value);
+              }
+            }, origin.localStorage);
+
+            await tempPage.close();
+            log(
+              "INFO",
+              `Restored ${origin.localStorage.length} localStorage items for ${origin.origin}`
+            );
+          }
+        }
+      }
+
+      log("INFO", "Storage state restored successfully");
+    } catch (error) {
+      log("WARN", "Failed to load storage state", error);
     }
   }
 
