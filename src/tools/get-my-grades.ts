@@ -5,6 +5,8 @@ import {
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
+import { applyCourseFilter } from "../utils/course-filter.js";
+import type { AppConfig } from "../types/index.js";
 
 interface GradeValue {
   GradeObjectIdentifier: string;
@@ -46,7 +48,8 @@ interface EnrollmentResponse {
  */
 export function registerGetMyGrades(
   server: McpServer,
-  apiClient: D2LApiClient
+  apiClient: D2LApiClient,
+  config: AppConfig
 ): void {
   server.registerTool(
     "get_my_grades",
@@ -96,8 +99,20 @@ export function registerGetMyGrades(
           { ttl: DEFAULT_CACHE_TTLS.enrollments }
         );
 
+        // Apply course filter
+        const filteredEnrollments = applyCourseFilter(
+          enrollmentResponse.Items.map(item => ({
+            id: item.OrgUnit.Id,
+            name: item.OrgUnit.Name,
+            code: item.OrgUnit.Code,
+            isActive: item.Access.IsActive,
+            ...item,
+          })),
+          config.courseFilter
+        );
+
         // Fetch grades for each course (handle 403s gracefully)
-        const gradePromises = enrollmentResponse.Items.map(async (item) => {
+        const gradePromises = filteredEnrollments.map(async (item) => {
           try {
             const path = apiClient.le(
               item.OrgUnit.Id,

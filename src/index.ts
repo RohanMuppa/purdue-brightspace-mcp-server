@@ -96,12 +96,21 @@ async function main(): Promise<void> {
 
     log("DEBUG", "check_auth tool registered");
 
+    // Log active course filter config if any filter is set
+    if (config.courseFilter.includeCourseIds || config.courseFilter.excludeCourseIds || !config.courseFilter.activeOnly) {
+      log("DEBUG", "Course filter enabled", {
+        includeCourseIds: config.courseFilter.includeCourseIds,
+        excludeCourseIds: config.courseFilter.excludeCourseIds,
+        activeOnly: config.courseFilter.activeOnly,
+      });
+    }
+
     // Register MCP tools
-    registerGetMyCourses(server, apiClient);
-    registerGetUpcomingDueDates(server, apiClient);
-    registerGetMyGrades(server, apiClient);
-    registerGetAnnouncements(server, apiClient);
-    registerGetAssignments(server, apiClient);
+    registerGetMyCourses(server, apiClient, config);
+    registerGetUpcomingDueDates(server, apiClient, config);
+    registerGetMyGrades(server, apiClient, config);
+    registerGetAnnouncements(server, apiClient, config);
+    registerGetAssignments(server, apiClient, config);
     registerGetCourseContent(server, apiClient);
     registerDownloadFile(server, apiClient);
     registerGetClasslistEmails(server, apiClient);

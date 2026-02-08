@@ -5,6 +5,8 @@ import {
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
+import { applyCourseFilter } from "../utils/course-filter.js";
+import type { AppConfig } from "../types/index.js";
 
 interface NewsItem {
   Id: number;
@@ -48,7 +50,8 @@ interface EnrollmentResponse {
  */
 export function registerGetAnnouncements(
   server: McpServer,
-  apiClient: D2LApiClient
+  apiClient: D2LApiClient,
+  config: AppConfig
 ): void {
   server.registerTool(
     "get_announcements",
@@ -107,8 +110,20 @@ export function registerGetAnnouncements(
           { ttl: DEFAULT_CACHE_TTLS.enrollments }
         );
 
+        // Apply course filter
+        const filteredEnrollments = applyCourseFilter(
+          enrollmentResponse.Items.map(item => ({
+            id: item.OrgUnit.Id,
+            name: item.OrgUnit.Name,
+            code: item.OrgUnit.Code,
+            isActive: item.Access.IsActive,
+            ...item,
+          })),
+          config.courseFilter
+        );
+
         // Fetch announcements for each course (handle 403s gracefully)
-        const announcementPromises = enrollmentResponse.Items.map(
+        const announcementPromises = filteredEnrollments.map(
           async (item) => {
             try {
               const path = apiClient.le(item.OrgUnit.Id, "/news/");

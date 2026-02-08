@@ -5,6 +5,8 @@ import {
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
+import { applyCourseFilter } from "../utils/course-filter.js";
+import type { AppConfig } from "../types/index.js";
 
 interface EventDataInfo {
   CalendarEventId: string;
@@ -16,12 +18,28 @@ interface EventDataInfo {
   IsAllDayEvent: boolean;
 }
 
+interface EnrollmentItem {
+  OrgUnit: {
+    Id: number;
+    Name: string;
+    Code: string;
+  };
+  Access: {
+    IsActive: boolean;
+  };
+}
+
+interface EnrollmentResponse {
+  Items: EnrollmentItem[];
+}
+
 /**
  * Register get_upcoming_due_dates tool
  */
 export function registerGetUpcomingDueDates(
   server: McpServer,
-  apiClient: D2LApiClient
+  apiClient: D2LApiClient,
+  config: AppConfig
 ): void {
   server.registerTool(
     "get_upcoming_due_dates",
@@ -50,11 +68,23 @@ export function registerGetUpcomingDueDates(
         if (courseId) {
           orgUnitIds = String(courseId);
         } else {
-          const enrollments = await apiClient.get<{ Items: { OrgUnit: { Id: number } }[] }>(
+          const enrollments = await apiClient.get<{ Items: EnrollmentItem[] }>(
             apiClient.lp(`/enrollments/myenrollments/?orgUnitTypeId=3&isActive=true`),
             { ttl: DEFAULT_CACHE_TTLS.enrollments }
           );
-          orgUnitIds = enrollments.Items.map((e) => e.OrgUnit.Id).join(",");
+
+          // Apply course filter
+          const filteredEnrollments = applyCourseFilter(
+            enrollments.Items.map(item => ({
+              id: item.OrgUnit.Id,
+              name: item.OrgUnit.Name,
+              code: item.OrgUnit.Code,
+              isActive: item.Access.IsActive,
+            })),
+            config.courseFilter
+          );
+
+          orgUnitIds = filteredEnrollments.map((e) => e.id).join(",");
         }
 
         // Build path

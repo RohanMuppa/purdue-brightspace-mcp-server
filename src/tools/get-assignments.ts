@@ -4,6 +4,8 @@ import { GetAssignmentsSchema } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { convertHtmlToMarkdown } from "../utils/html-converter.js";
 import { log } from "../utils/logger.js";
+import { applyCourseFilter } from "../utils/course-filter.js";
+import type { AppConfig } from "../types/index.js";
 
 // D2L Dropbox API types
 interface DropboxFolder {
@@ -283,7 +285,8 @@ async function fetchCourseAssignments(
  */
 export function registerGetAssignments(
   server: McpServer,
-  apiClient: D2LApiClient
+  apiClient: D2LApiClient,
+  config: AppConfig
 ): void {
   server.registerTool(
     "get_assignments",
@@ -318,8 +321,20 @@ export function registerGetAssignments(
           { ttl: DEFAULT_CACHE_TTLS.enrollments }
         );
 
+        // Apply course filter
+        const filteredEnrollments = applyCourseFilter(
+          enrollmentResponse.Items.map(item => ({
+            id: item.OrgUnit.Id,
+            name: item.OrgUnit.Name,
+            code: item.OrgUnit.Code,
+            isActive: item.Access.IsActive,
+            ...item,
+          })),
+          config.courseFilter
+        );
+
         // Fetch assignments for each course (handle 403s gracefully)
-        const assignmentPromises = enrollmentResponse.Items.map(async (item) => {
+        const assignmentPromises = filteredEnrollments.map(async (item) => {
           try {
             const assignments = await fetchCourseAssignments(apiClient, item.OrgUnit.Id);
 

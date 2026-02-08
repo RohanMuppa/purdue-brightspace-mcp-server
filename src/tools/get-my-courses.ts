@@ -5,6 +5,8 @@ import {
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
+import { applyCourseFilter } from "../utils/course-filter.js";
+import type { AppConfig } from "../types/index.js";
 
 interface EnrollmentItem {
   OrgUnit: {
@@ -32,7 +34,8 @@ interface EnrollmentResponse {
  */
 export function registerGetMyCourses(
   server: McpServer,
-  apiClient: D2LApiClient
+  apiClient: D2LApiClient,
+  config: AppConfig
 ): void {
   server.registerTool(
     "get_my_courses",
@@ -68,15 +71,18 @@ export function registerGetMyCourses(
           );
         }
 
-        // Map to clean objects
-        const courses = response.Items.map((item) => ({
-          id: item.OrgUnit.Id,
-          name: item.OrgUnit.Name,
-          code: item.OrgUnit.Code,
-          role: item.Access.ClasslistRoleName,
-          isActive: item.Access.IsActive,
-          lastAccessed: item.Access.LastAccessed,
-        }));
+        // Map to clean objects and apply course filter
+        const courses = applyCourseFilter(
+          response.Items.map((item) => ({
+            id: item.OrgUnit.Id,
+            name: item.OrgUnit.Name,
+            code: item.OrgUnit.Code,
+            role: item.Access.ClasslistRoleName,
+            isActive: item.Access.IsActive,
+            lastAccessed: item.Access.LastAccessed,
+          })),
+          config.courseFilter
+        );
 
         log("INFO", `get_my_courses: Retrieved ${courses.length} courses`);
         return toolResponse(courses);
