@@ -25,7 +25,7 @@ export function registerDownloadFile(
     {
       title: "Download File",
       description:
-        "Download a file from course content or submissions. Provide courseId + topicId for content files, or courseId + folderId + fileId for submission files. Files are saved to the specified downloadPath with security validation.",
+        "Download a file from course content or assignment submissions to a local directory. Use this when the user wants to download, save, or get a file from Brightspace course content or dropbox submissions.",
       inputSchema: DownloadFileSchema,
     },
     async (args: any) => {

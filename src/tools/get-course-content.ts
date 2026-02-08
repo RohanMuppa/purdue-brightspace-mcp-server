@@ -192,7 +192,7 @@ export function registerGetCourseContent(
     {
       title: "Get Course Content",
       description:
-        "Fetch the full hierarchical content tree (modules and topics) for a course. Shows file descriptions, link URLs, HTML content as markdown, and progress/completion status. Optional type filter for specific content types.",
+        "Fetch the content tree for a course showing modules, topics, files, and links. Use this when the user asks about course materials, lecture slides, uploaded files, content structure, or what's in a course module.",
       inputSchema: GetCourseContentSchema,
     },
     async (args: any) => {

@@ -56,7 +56,7 @@ export function registerGetMyGrades(
     {
       title: "Get My Grades",
       description:
-        "Fetch your grade breakdown for a specific course or all enrolled courses. Shows grade items with points, percentages, and comments.",
+        "Fetch your grade breakdown for a specific course or all enrolled courses. Shows grade items with points, percentages, and comments. Use this when the user asks about grades, scores, marks, GPA, academic performance, or how they're doing in a class.",
       inputSchema: GetMyGradesSchema,
     },
     async (args: any) => {

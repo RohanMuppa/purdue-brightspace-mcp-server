@@ -61,7 +61,7 @@ async function main(): Promise<void> {
       {
         title: "Check Authentication Status",
         description:
-          "Check if you are authenticated with Purdue Brightspace. Run the purdue-brightspace-auth CLI first to authenticate.",
+          "Check if you are authenticated with Purdue Brightspace. Run the purdue-brightspace-auth CLI first to authenticate. Use this when the user asks if they're logged in, if authentication is working, or when other tools return auth errors.",
       },
       async () => {
         log("DEBUG", "check_auth tool called");
