@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { D2LApiClient, DEFAULT_CACHE_TTLS } from "../api/index.js";
 import {
   GetAnnouncementsSchema,
-  getAnnouncementsInputSchema,
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
@@ -57,7 +56,7 @@ export function registerGetAnnouncements(
       title: "Get Announcements",
       description:
         "Fetch recent announcements from your courses. Can filter to a specific course or get announcements across all courses.",
-      inputSchema: getAnnouncementsInputSchema as any,
+      inputSchema: GetAnnouncementsSchema,
     },
     async (args: any) => {
       try {

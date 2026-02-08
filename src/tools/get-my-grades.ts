@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { D2LApiClient, DEFAULT_CACHE_TTLS } from "../api/index.js";
 import {
   GetMyGradesSchema,
-  getMyGradesInputSchema,
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
@@ -55,7 +54,7 @@ export function registerGetMyGrades(
       title: "Get My Grades",
       description:
         "Fetch your grade breakdown for a specific course or all enrolled courses. Shows grade items with points, percentages, and comments.",
-      inputSchema: getMyGradesInputSchema as any,
+      inputSchema: GetMyGradesSchema,
     },
     async (args: any) => {
       try {

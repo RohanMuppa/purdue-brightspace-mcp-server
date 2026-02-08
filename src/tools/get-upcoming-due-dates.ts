@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { D2LApiClient, DEFAULT_CACHE_TTLS } from "../api/index.js";
 import {
   GetUpcomingDueDatesSchema,
-  getUpcomingDueDatesInputSchema,
 } from "./schemas.js";
 import { toolResponse, sanitizeError } from "./tool-helpers.js";
 import { log } from "../utils/logger.js";
@@ -30,7 +29,7 @@ export function registerGetUpcomingDueDates(
       title: "Get Upcoming Due Dates",
       description:
         "Fetch upcoming due dates across all your courses. Shows assignments, quizzes, and other items due within the specified time window.",
-      inputSchema: getUpcomingDueDatesInputSchema as any,
+      inputSchema: GetUpcomingDueDatesSchema,
     },
     async (args: any) => {
       try {
