@@ -19,15 +19,15 @@ interface ClasslistUser {
 }
 
 interface ClasslistResponse {
-  Items: ClasslistUser[];
-  PagingInfo?: { HasMoreItems: boolean; Bookmark?: string };
+  Objects: ClasslistUser[];
+  Next?: string | null;
 }
 
 // Purdue-specific role IDs. These are institution-specific values.
 // If using at another institution, you may need to adjust these.
 // Discover by fetching classlist for a known course and inspecting RoleId values.
-const INSTRUCTOR_ROLE_ID = 110;
-const TA_ROLE_ID = 113;
+const INSTRUCTOR_ROLE_ID = 109;
+const TA_ROLE_ID = 135;
 
 /**
  * Fetch a page of classlist users with optional filters
@@ -57,15 +57,15 @@ async function fetchClasslistPage(
     ttl: DEFAULT_CACHE_TTLS.roster,
   });
 
-  if (response.PagingInfo?.HasMoreItems) {
+  if (response.Next) {
     log(
       "WARN",
       "get_roster: Pagination detected but not implemented. Some users may be missing.",
-      { courseId, hasMore: true }
+      { courseId, next: response.Next }
     );
   }
 
-  return response.Items;
+  return response.Objects;
 }
 
 /**
