@@ -110,11 +110,11 @@ async function fetchCourseAssignments(
 
   // Fetch dropbox folders and quizzes in parallel
   const [dropboxResult, quizResult] = await Promise.allSettled([
-    apiClient.get<DropboxFolder[]>(
+    apiClient.get<{ Objects: DropboxFolder[] } | DropboxFolder[]>(
       apiClient.le(courseId, "/dropbox/folders/"),
       { ttl: DEFAULT_CACHE_TTLS.assignments }
     ),
-    apiClient.get<QuizReadData[]>(
+    apiClient.get<{ Objects: QuizReadData[] } | QuizReadData[]>(
       apiClient.le(courseId, "/quizzes/"),
       { ttl: DEFAULT_CACHE_TTLS.assignments }
     ),
@@ -122,7 +122,9 @@ async function fetchCourseAssignments(
 
   // Process Dropbox folders
   if (dropboxResult.status === "fulfilled") {
-    const folders = dropboxResult.value;
+    // D2L dropbox endpoint may return paged { Objects: [...] } or flat array
+    const dropboxRaw = dropboxResult.value;
+    const folders: DropboxFolder[] = Array.isArray(dropboxRaw) ? dropboxRaw : (dropboxRaw as any).Objects ?? [];
 
     for (const folder of folders) {
       // Skip hidden folders
@@ -131,10 +133,11 @@ async function fetchCourseAssignments(
       // Fetch submissions for this folder
       let submissions: DropboxSubmission[] = [];
       try {
-        submissions = await apiClient.get<DropboxSubmission[]>(
+        const submissionsRaw = await apiClient.get<{ Objects: DropboxSubmission[] } | DropboxSubmission[]>(
           apiClient.le(courseId, `/dropbox/folders/${folder.Id}/submissions/mysubmissions/`),
           { ttl: DEFAULT_CACHE_TTLS.assignments }
         );
+        submissions = Array.isArray(submissionsRaw) ? submissionsRaw : (submissionsRaw as any).Objects ?? [];
       } catch (error: any) {
         // 404 means no submissions yet - that's fine
         if (error?.status !== 404) {
@@ -223,10 +226,12 @@ async function fetchCourseAssignments(
       // Fetch quiz attempts
       let attempts: QuizAttemptData[] = [];
       try {
-        attempts = await apiClient.get<QuizAttemptData[]>(
+        const attemptsRaw = await apiClient.get<{ Objects: QuizAttemptData[] } | QuizAttemptData[]>(
           apiClient.le(courseId, `/quizzes/${quiz.QuizId}/attempts/`),
           { ttl: DEFAULT_CACHE_TTLS.assignments }
         );
+        // D2L attempts endpoint may return paged { Objects: [...] } or flat array
+        attempts = Array.isArray(attemptsRaw) ? attemptsRaw : (attemptsRaw as any).Objects ?? [];
       } catch (error: any) {
         // 404 means no attempts yet - that's fine
         if (error?.status !== 404 && error?.status !== 403) {
@@ -374,6 +379,10 @@ export function registerGetAssignments(
         );
         return toolResponse({ courses });
       } catch (error) {
+        // Temporary: log full error details to stderr for debugging
+        if (error instanceof Error) {
+          log("ERROR", `get_assignments failed: ${error.message}\n${error.stack}`);
+        }
         return sanitizeError(error);
       }
     }
