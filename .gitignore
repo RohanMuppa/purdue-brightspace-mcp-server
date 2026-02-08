@@ -5,3 +5,4 @@ build/
 .planning/
 .claude/
 .DS_Store
+.mcp.json
