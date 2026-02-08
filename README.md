@@ -1,42 +1,146 @@
 # Purdue Brightspace MCP Server
 
-An MCP server that connects Claude to your Purdue Brightspace account, allowing you to ask natural language questions about your courses, grades, and assignments.
+Ask Claude about your Brightspace courses using natural language. Get grades, due dates, announcements, rosters, and more — right in Claude Desktop.
 
-## Features
+## What You Can Do
 
-- **Authenticated Access**: Securely logs in via Purdue SSO (Shibboleth/CAS + Duo 2FA) and manages session tokens.
-- **Course Data**: Fetch enrolled courses, grades, assignments, announcements, and content.
-- **Natural Language Queries**: Ask questions like "What assignments are due next week?" or "Check my grades for CS 252".
+- "What assignments are due this week?"
+- "Show my grades for CS 252"
+- "What announcements did my professors post today?"
+- "Who is the instructor for MATH 266?"
+- "Download the lecture slides from Module 3"
+- "What's my grade in all my classes?"
+- "Get me the roster emails for my CS course"
+
+## Prerequisites
+
+1. **Node.js** (version 18 or higher)
+   - Download from https://nodejs.org/ (choose the LTS version)
+   - To check if you already have it: Open Terminal (Mac) or Command Prompt (Windows) and type `node --version`
+
+2. **Claude Desktop**
+   - Download from https://claude.ai/download
 
 ## Setup
 
-1.  **Clone the Repository**:
-    ```bash
-    git clone https://github.com/RohanMuppa/purdue-brightspace-mcp.git
-    cd purdue-brightspace-mcp
-    ```
+### Step 1: Clone this repository
 
-2.  **Install Dependencies**:
-    ```bash
-    npm install
-    npx playwright install chromium
-    ```
+Open Terminal (Mac) or Command Prompt (Windows) and run:
 
-3.  **Configure Environment**:
-    Copy the example environment file:
-    ```bash
-    cp .env.example .env
-    ```
-    Edit `.env` with your Purdue credentials (`D2L_USERNAME`, `D2L_PASSWORD`). You can optionally set `MFA_TOTP_SECRET` for automated 2FA, otherwise you will approve Duo pushes manually.
+```bash
+git clone https://github.com/YOUR_USERNAME/purdue-brightspace-mcp.git
+cd purdue-brightspace-mcp
+```
 
-4.  **Build**:
-    ```bash
-    npm run build
-    ```
+### Step 2: Install dependencies
 
-## Usage
+```bash
+npm install
+```
 
-Add the following to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+This will take about 1-2 minutes. It will also automatically install Chromium (used for authentication).
+
+### Step 3: Build the project
+
+```bash
+npm run build
+```
+
+This compiles the TypeScript code. It should complete in a few seconds.
+
+### Step 4: Authenticate with Brightspace
+
+```bash
+npm run auth
+```
+
+**What happens:**
+1. A browser window will open
+2. Log in with your Purdue credentials (username@purdue.edu)
+3. Approve the Duo push notification on your phone
+4. The browser will close automatically once authenticated
+
+**Note:** You only need to do this once. The session lasts about 1 hour. When it expires, just run `npm run auth` again.
+
+### Step 5: Configure Claude Desktop
+
+Find your Claude Desktop configuration file:
+- **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+Open it in a text editor and add this configuration (if the file doesn't exist, create it):
+
+```json
+{
+  "mcpServers": {
+    "purdue-brightspace": {
+      "command": "node",
+      "args": ["/absolute/path/to/purdue-brightspace-mcp/build/index.js"]
+    }
+  }
+}
+```
+
+**Important:** Replace `/absolute/path/to/purdue-brightspace-mcp` with the actual path on your computer.
+
+To find the path:
+- **Mac/Linux**: In Terminal, go to the project directory and run `pwd`
+- **Windows**: In Command Prompt, go to the project directory and run `cd`
+
+**Example (Mac):**
+```json
+{
+  "mcpServers": {
+    "purdue-brightspace": {
+      "command": "node",
+      "args": ["/Users/YOUR_USERNAME/purdue-brightspace-mcp/build/index.js"]
+    }
+  }
+}
+```
+
+**Example (Windows):**
+```json
+{
+  "mcpServers": {
+    "purdue-brightspace": {
+      "command": "node",
+      "args": ["C:\\Users\\YOUR_USERNAME\\purdue-brightspace-mcp\\build\\index.js"]
+    }
+  }
+}
+```
+
+Save the file and **restart Claude Desktop completely** (quit and reopen).
+
+### Step 6: Verify it works
+
+1. Open Claude Desktop
+2. Start a new conversation
+3. Try asking: **"What are my courses?"**
+
+If it works, you'll see a list of your Brightspace courses! The MCP server works globally in Claude Desktop — you can ask Brightspace questions in any conversation.
+
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `check_auth` | Check if you're logged in to Brightspace |
+| `get_my_courses` | Get all your enrolled courses |
+| `get_upcoming_due_dates` | Get assignments and quizzes due soon |
+| `get_my_grades` | Get your grades for one or all courses |
+| `get_announcements` | Get course announcements |
+| `get_assignments` | Get detailed assignment and quiz information |
+| `get_course_content` | Browse course content (modules, files, links) |
+| `download_file` | Download course files or submission attachments |
+| `get_classlist_emails` | Get email addresses for instructors and TAs |
+| `get_roster` | Get course roster (instructors, TAs, optionally students) |
+
+## Advanced Configuration
+
+### Filter courses
+
+If you have a lot of courses and want to hide some from Claude's view, you can add course filters to your Claude Desktop config:
 
 ```json
 {
@@ -45,15 +149,58 @@ Add the following to your Claude Desktop configuration (`~/Library/Application S
       "command": "node",
       "args": ["/absolute/path/to/purdue-brightspace-mcp/build/index.js"],
       "env": {
-        "D2L_USERNAME": "your_username@purdue.edu",
-        "D2L_PASSWORD": "your_password"
+        "D2L_INCLUDE_COURSES": "123456,789012",
+        "D2L_EXCLUDE_COURSES": "111111,222222",
+        "D2L_ACTIVE_ONLY": "true"
       }
     }
   }
 }
 ```
 
-Restart Claude and start asking questions!
+**Options:**
+- `D2L_INCLUDE_COURSES`: Only show these course IDs (comma-separated). Overrides other filters.
+- `D2L_EXCLUDE_COURSES`: Hide these course IDs (comma-separated).
+- `D2L_ACTIVE_ONLY`: Set to `"false"` to show inactive courses (default: `"true"`).
+
+**How to find course IDs:**
+Ask Claude "What are my courses?" and it will show the IDs.
+
+### Re-authenticate
+
+Your Brightspace session expires after about 1 hour. When it does, Claude will tell you "Not authenticated."
+
+To log in again:
+```bash
+npm run auth
+```
+
+You don't need to restart Claude Desktop after re-authenticating.
+
+## Troubleshooting
+
+**"Not authenticated" error**
+- **Solution**: Run `npm run auth` in the project directory. The browser will open and you'll log in again.
+
+**Claude doesn't respond to Brightspace queries**
+- **Solution 1**: Restart Claude Desktop completely (quit and reopen, not just close the window).
+- **Solution 2**: Check that the path in `claude_desktop_config.json` is correct and points to `build/index.js`.
+- **Solution 3**: Make sure you ran `npm run build` after any code changes.
+
+**Browser doesn't open during authentication**
+- **Solution**: Make sure you have a default browser set. Try running `npm run auth` again. If it still doesn't work, check that Chromium was installed correctly with `npx playwright install chromium`.
+
+## Security
+
+- Your Purdue credentials are never stored in this repository or in the code.
+- Session tokens are encrypted using AES-256-GCM and stored in `~/.d2l-session/` (outside this project).
+- Token files have restricted permissions (only your user account can read them).
+- Tokens expire after about 1 hour for security.
+- All communication with Brightspace uses HTTPS.
+
+## Contributing
+
+Found a bug or have a feature request? Open an issue on GitHub!
 
 ## License
 
