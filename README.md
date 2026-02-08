@@ -21,6 +21,7 @@ Access your Purdue Brightspace courses using natural language. Get grades, due d
 2. **An MCP client** (any of these work)
    - [Claude Desktop](https://claude.ai/download)
    - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+   - [ChatGPT Desktop](https://openai.com/chatgpt/desktop/)
    - [Cursor](https://cursor.com)
    - Or any other app that supports MCP
 
