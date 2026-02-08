@@ -28,7 +28,7 @@ Ask Claude about your Brightspace courses using natural language. Get grades, du
 Open Terminal (Mac) or Command Prompt (Windows) and run:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/purdue-brightspace-mcp.git
+git clone https://github.com/username/purdue-brightspace-mcp.git
 cd purdue-brightspace-mcp
 ```
 
@@ -93,7 +93,7 @@ To find the path:
   "mcpServers": {
     "purdue-brightspace": {
       "command": "node",
-      "args": ["/Users/YOUR_USERNAME/purdue-brightspace-mcp/build/index.js"]
+      "args": ["/Users/username/purdue-brightspace-mcp/build/index.js"]
     }
   }
 }
@@ -105,7 +105,7 @@ To find the path:
   "mcpServers": {
     "purdue-brightspace": {
       "command": "node",
-      "args": ["C:\\Users\\YOUR_USERNAME\\purdue-brightspace-mcp\\build\\index.js"]
+      "args": ["C:\\Users\\username\\purdue-brightspace-mcp\\build\\index.js"]
     }
   }
 }
