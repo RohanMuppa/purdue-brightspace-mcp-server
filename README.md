@@ -1,6 +1,6 @@
 # Purdue Brightspace MCP Server
 
-Ask Claude about your Brightspace courses using natural language. Get grades, due dates, announcements, rosters, and more — right in Claude Desktop.
+Access your Purdue Brightspace courses using natural language. Get grades, due dates, announcements, rosters, and more — works with any MCP client (Claude Desktop, Claude Code, Cursor, etc.).
 
 ## What You Can Do
 
@@ -18,8 +18,11 @@ Ask Claude about your Brightspace courses using natural language. Get grades, du
    - Download from https://nodejs.org/ (choose the LTS version)
    - To check if you already have it: Open Terminal (Mac) or Command Prompt (Windows) and type `node --version`
 
-2. **Claude Desktop**
-   - Download from https://claude.ai/download
+2. **An MCP client** (any of these work)
+   - [Claude Desktop](https://claude.ai/download)
+   - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+   - [Cursor](https://cursor.com)
+   - Or any other app that supports MCP
 
 ## Setup
 
@@ -62,9 +65,11 @@ npm run auth
 
 **Note:** You only need to do this once. The session lasts about 1 hour. When it expires, just run `npm run auth` again.
 
-### Step 5: Configure Claude Desktop
+### Step 5: Configure your MCP client
 
-Find your Claude Desktop configuration file:
+The setup below uses Claude Desktop as an example, but this server works with any MCP client.
+
+**Claude Desktop config file location:**
 - **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
@@ -111,15 +116,15 @@ To find the path:
 }
 ```
 
-Save the file and **restart Claude Desktop completely** (quit and reopen).
+Save the file and **restart your MCP client completely** (quit and reopen).
 
 ### Step 6: Verify it works
 
-1. Open Claude Desktop
+1. Open your MCP client
 2. Start a new conversation
 3. Try asking: **"What are my courses?"**
 
-If it works, you'll see a list of your Brightspace courses! The MCP server works globally in Claude Desktop — you can ask Brightspace questions in any conversation.
+If it works, you'll see a list of your Brightspace courses!
 
 ## Available Tools
 
@@ -140,7 +145,7 @@ If it works, you'll see a list of your Brightspace courses! The MCP server works
 
 ### Filter courses
 
-If you have a lot of courses and want to hide some from Claude's view, you can add course filters to your Claude Desktop config:
+If you have a lot of courses and want to hide some, you can add course filters to your MCP client config:
 
 ```json
 {
@@ -164,27 +169,27 @@ If you have a lot of courses and want to hide some from Claude's view, you can a
 - `D2L_ACTIVE_ONLY`: Set to `"false"` to show inactive courses (default: `"true"`).
 
 **How to find course IDs:**
-Ask Claude "What are my courses?" and it will show the IDs.
+Ask "What are my courses?" and the tool will show the IDs.
 
 ### Re-authenticate
 
-Your Brightspace session expires after about 1 hour. When it does, Claude will tell you "Not authenticated."
+Your Brightspace session expires after about 1 hour. When it does, the server will report "Not authenticated."
 
 To log in again:
 ```bash
 npm run auth
 ```
 
-You don't need to restart Claude Desktop after re-authenticating.
+You don't need to restart your MCP client after re-authenticating.
 
 ## Troubleshooting
 
 **"Not authenticated" error**
 - **Solution**: Run `npm run auth` in the project directory. The browser will open and you'll log in again.
 
-**Claude doesn't respond to Brightspace queries**
-- **Solution 1**: Restart Claude Desktop completely (quit and reopen, not just close the window).
-- **Solution 2**: Check that the path in `claude_desktop_config.json` is correct and points to `build/index.js`.
+**MCP client doesn't respond to Brightspace queries**
+- **Solution 1**: Restart your MCP client completely (quit and reopen, not just close the window).
+- **Solution 2**: Check that the path in your MCP config is correct and points to `build/index.js`.
 - **Solution 3**: Make sure you ran `npm run build` after any code changes.
 
 **Browser doesn't open during authentication**
