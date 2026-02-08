@@ -1,0 +1,283 @@
+import type { D2LApiClientOptions, ApiVersions, CacheTTLs, TokenData } from "./types.js";
+import { DEFAULT_CACHE_TTLS } from "./types.js";
+import { TTLCache } from "./cache.js";
+import { TokenBucket } from "./rate-limiter.js";
+import { discoverVersions } from "./version-discovery.js";
+import { ApiError, RateLimitError, NetworkError } from "./errors.js";
+import { log } from "../utils/logger.js";
+
+/**
+ * D2L API client with authentication, caching, rate limiting, and version discovery.
+ *
+ * Key features:
+ * - Auto-discovers LP/LE versions from /d2l/api/versions/
+ * - Supports both Bearer tokens and cookie-based auth (auto-detected via "cookie:" prefix)
+ * - Client-side rate limiting using token bucket algorithm
+ * - In-memory response caching with per-data-type TTLs
+ * - 401 retry logic: retry once with fresh token, then clear and throw
+ * - HTTPS-only enforcement
+ * - Browser-like User-Agent for requests
+ * - Raw response passthrough (no transformation)
+ */
+export class D2LApiClient {
+  private readonly baseUrl: string;
+  private readonly tokenManager: D2LApiClientOptions["tokenManager"];
+  private readonly cache: TTLCache;
+  private readonly rateLimiter: TokenBucket;
+  private readonly cacheTTLs: CacheTTLs;
+  private readonly timeoutMs: number;
+  private versions: ApiVersions | null = null;
+
+  constructor(options: D2LApiClientOptions) {
+    // HTTPS-only enforcement
+    if (options.baseUrl.startsWith("http://")) {
+      throw new Error(
+        "HTTPS is required for D2L API client. HTTP URLs are not allowed for security reasons.",
+      );
+    }
+
+    // Strip trailing slash from baseUrl
+    this.baseUrl = options.baseUrl.replace(/\/$/, "");
+    this.tokenManager = options.tokenManager;
+    this.timeoutMs = options.timeoutMs ?? 30_000;
+
+    // Merge user-provided TTLs with defaults
+    this.cacheTTLs = { ...DEFAULT_CACHE_TTLS, ...options.cacheTTLs };
+
+    // Initialize cache and rate limiter
+    this.cache = new TTLCache();
+    const rateLimitConfig = options.rateLimitConfig ?? {
+      capacity: 10,
+      refillRate: 3,
+    };
+    this.rateLimiter = new TokenBucket(
+      rateLimitConfig.capacity,
+      rateLimitConfig.refillRate,
+    );
+
+    log("DEBUG", `D2LApiClient initialized for ${this.baseUrl}`);
+  }
+
+  /**
+   * Initialize the client by discovering API versions.
+   * Must be called before making API requests.
+   */
+  async initialize(): Promise<void> {
+    this.versions = await discoverVersions(this.baseUrl, this.timeoutMs);
+    log(
+      "INFO",
+      `D2L API versions discovered: LP ${this.versions.lp}, LE ${this.versions.le}`,
+    );
+  }
+
+  /**
+   * Get discovered API versions.
+   * @throws Error if initialize() hasn't been called yet
+   */
+  get apiVersions(): ApiVersions {
+    if (!this.versions) {
+      throw new Error(
+        "API client not initialized. Call initialize() before accessing apiVersions.",
+      );
+    }
+    return this.versions;
+  }
+
+  /**
+   * Make a GET request to the D2L API.
+   *
+   * @param path - API path (e.g., "/d2l/api/lp/1.56/users/whoami")
+   * @param options - Request options (ttl for caching)
+   * @returns Parsed JSON response (raw, no transformation)
+   * @throws ApiError on HTTP errors (401, 403, 429, etc.)
+   * @throws NetworkError on network/fetch failures
+   */
+  async get<T>(path: string, options?: { ttl?: number }): Promise<T> {
+    // Check cache first
+    if (options?.ttl && this.cache.has(path)) {
+      log("DEBUG", `Cache hit: ${path}`);
+      return this.cache.get(path) as T;
+    }
+
+    // Enforce rate limit
+    await this.rateLimiter.consume();
+
+    // Get authentication token
+    const token = await this.tokenManager.getToken();
+    if (!token) {
+      throw new ApiError(401, path, "Not authenticated");
+    }
+
+    // Make request with retry logic
+    return await this.makeRequest<T>(path, token, options);
+  }
+
+  /**
+   * Internal method to make HTTP request with 401 retry logic.
+   */
+  private async makeRequest<T>(
+    path: string,
+    token: TokenData,
+    options?: { ttl?: number },
+    isRetry: boolean = false,
+  ): Promise<T> {
+    const url = `${this.baseUrl}${path}`;
+    const headers = this.buildAuthHeaders(token);
+
+    try {
+      log("DEBUG", `${isRetry ? "Retrying" : "Requesting"} GET ${path}`);
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+
+      // Handle 401 with retry logic
+      if (response.status === 401) {
+        if (isRetry) {
+          // Second 401 - clear token and throw
+          log("DEBUG", "Second 401 response, clearing token");
+          await this.tokenManager.clearToken();
+          throw new ApiError(
+            401,
+            path,
+            "Session expired. Please re-authenticate via purdue-brightspace-auth CLI.",
+          );
+        }
+
+        // First 401 - try to get fresher token
+        log("DEBUG", "First 401 response, attempting retry with fresh token");
+        const freshToken = await this.tokenManager.getToken();
+
+        if (!freshToken || freshToken.accessToken === token.accessToken) {
+          // No fresher token available
+          await this.tokenManager.clearToken();
+          throw new ApiError(
+            401,
+            path,
+            "Session expired. Please re-authenticate via purdue-brightspace-auth CLI.",
+          );
+        }
+
+        // Retry with fresh token
+        return await this.makeRequest<T>(path, freshToken, options, true);
+      }
+
+      // Handle 429 rate limiting
+      if (response.status === 429) {
+        const retryAfter = response.headers.get("Retry-After");
+        const retryAfterSeconds = retryAfter ? parseInt(retryAfter, 10) : undefined;
+        throw new RateLimitError(path, retryAfterSeconds);
+      }
+
+      // Handle 403 (common for past-semester courses)
+      if (response.status === 403) {
+        const responseText = await response.text();
+        throw new ApiError(403, path, responseText);
+      }
+
+      // Handle other non-OK responses
+      if (!response.ok) {
+        const responseText = await response.text();
+        throw new ApiError(response.status, path, responseText);
+      }
+
+      // Parse and cache response
+      const data: T = await response.json();
+
+      if (options?.ttl) {
+        this.cache.set(path, data, options.ttl);
+        log("DEBUG", `Cached response for ${path} (TTL: ${options.ttl}ms)`);
+      }
+
+      return data;
+    } catch (error) {
+      // Re-throw our own errors
+      if (
+        error instanceof ApiError ||
+        error instanceof RateLimitError ||
+        error instanceof NetworkError
+      ) {
+        throw error;
+      }
+
+      // Wrap network/fetch errors
+      const message = error instanceof Error ? error.message : String(error);
+      throw new NetworkError(
+        `Request to ${path} failed: ${message}`,
+        error instanceof Error ? error : undefined,
+      );
+    }
+  }
+
+  /**
+   * Build authentication headers for a request.
+   * Supports both Bearer tokens and cookie-based auth.
+   */
+  private buildAuthHeaders(token: TokenData): Record<string, string> {
+    const headers: Record<string, string> = {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    };
+
+    // Auto-detect cookie vs Bearer auth based on "cookie:" prefix
+    if (token.accessToken.startsWith("cookie:")) {
+      // Cookie-based auth: strip prefix and set Cookie header
+      headers["Cookie"] = token.accessToken.substring(7);
+      log("DEBUG", "Using cookie-based authentication");
+    } else {
+      // Bearer token auth
+      headers["Authorization"] = `Bearer ${token.accessToken}`;
+      log("DEBUG", "Using Bearer token authentication");
+    }
+
+    return headers;
+  }
+
+  /**
+   * Build path for LP (Learning Platform) API endpoints.
+   * @param path - Path within LP API (e.g., "/users/whoami")
+   * @returns Full versioned path (e.g., "/d2l/api/lp/1.56/users/whoami")
+   */
+  lp(path: string): string {
+    const { lp } = this.apiVersions;
+    return `/d2l/api/lp/${lp}${path}`;
+  }
+
+  /**
+   * Build path for LE (Learning Environment) API endpoints with orgUnitId.
+   * @param orgUnitId - Organizational unit ID (course ID)
+   * @param path - Path within LE API (e.g., "/content/root/")
+   * @returns Full versioned path (e.g., "/d2l/api/le/1.91/123456/content/root/")
+   */
+  le(orgUnitId: number, path: string): string {
+    const { le } = this.apiVersions;
+    return `/d2l/api/le/${le}/${orgUnitId}${path}`;
+  }
+
+  /**
+   * Build path for global LE (Learning Environment) API endpoints without orgUnitId.
+   * @param path - Path within LE API (e.g., "/enrollments/myenrollments/")
+   * @returns Full versioned path (e.g., "/d2l/api/le/1.91/enrollments/myenrollments/")
+   */
+  leGlobal(path: string): string {
+    const { le } = this.apiVersions;
+    return `/d2l/api/le/${le}${path}`;
+  }
+
+  /**
+   * Clear all cached responses.
+   */
+  clearCache(): void {
+    this.cache.clear();
+    log("DEBUG", "Cache cleared");
+  }
+
+  /**
+   * Get current cache size (number of cached entries).
+   */
+  get cacheSize(): number {
+    return this.cache.size;
+  }
+}
