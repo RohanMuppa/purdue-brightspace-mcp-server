@@ -163,7 +163,7 @@ async function fetchCourseAssignments(
         type: "assignment",
         id: folder.Id,
         name: folder.Name,
-        instructions: folder.CustomInstructions
+        instructions: folder.CustomInstructions?.Html
           ? convertHtmlToMarkdown(folder.CustomInstructions.Html)
           : { markdown: "", html: "" },
         dueDate: folder.DueDate,
@@ -171,30 +171,30 @@ async function fetchCourseAssignments(
         isGroup: folder.GroupTypeId !== null,
         rubric: folder.Assessment?.Rubrics?.map((r) => ({
           name: r.Name,
-          criteria: r.Criteria.map((c) => ({
+          criteria: r.Criteria?.map((c) => ({
             name: c.Name,
-            levels: c.Levels.map((l) => ({
+            levels: c.Levels?.map((l) => ({
               name: l.Name,
               points: l.Points,
               description: l.Description?.Text ?? null,
-            })),
-          })),
+            })) ?? [],
+          })) ?? [],
         })) ?? null,
         submission: submissions.length > 0
           ? {
               submittedDate: submissions[0].SubmissionDate,
-              files: submissions[0].Files.map((f) => ({
+              files: submissions[0].Files?.map((f) => ({
                 name: f.FileName,
                 size: f.Size,
                 fileId: f.FileId,
-              })),
+              })) ?? [],
               comment: submissions[0].Comment?.Text ?? null,
             }
           : null,
         feedback: feedback
           ? {
               score: feedback.Score,
-              feedback: feedback.Feedback
+              feedback: feedback.Feedback?.Html
                 ? convertHtmlToMarkdown(feedback.Feedback.Html)
                 : null,
             }
@@ -210,7 +210,11 @@ async function fetchCourseAssignments(
 
   // Process Quizzes
   if (quizResult.status === "fulfilled") {
-    const quizzes = quizResult.value;
+    const quizResponse = quizResult.value;
+    // D2L quizzes API returns paged result { Objects: [...] } or a plain array
+    const quizzes: QuizReadData[] = Array.isArray(quizResponse)
+      ? quizResponse
+      : (quizResponse as any)?.Objects ?? [];
 
     for (const quiz of quizzes) {
       // Skip inactive quizzes
@@ -252,7 +256,7 @@ async function fetchCourseAssignments(
         type: "quiz",
         id: quiz.QuizId,
         name: quiz.Name,
-        instructions: quiz.Description
+        instructions: quiz.Description?.Html
           ? convertHtmlToMarkdown(quiz.Description.Html)
           : { markdown: "", html: "" },
         dueDate: quiz.DueDate,
