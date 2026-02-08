@@ -113,6 +113,30 @@ export class D2LApiClient {
   }
 
   /**
+   * Make a GET request to the D2L API and return raw Response object.
+   * Used for binary file downloads where JSON parsing is not desired.
+   * Does NOT cache responses (file downloads shouldn't be cached).
+   *
+   * @param path - API path (e.g., "/d2l/api/le/1.91/123456/content/topics/789/file")
+   * @returns Raw Response object for binary data extraction
+   * @throws ApiError on HTTP errors (401, 403, 429, etc.)
+   * @throws NetworkError on network/fetch failures
+   */
+  async getRaw(path: string): Promise<Response> {
+    // Enforce rate limit
+    await this.rateLimiter.consume();
+
+    // Get authentication token
+    const token = await this.tokenManager.getToken();
+    if (!token) {
+      throw new ApiError(401, path, "Not authenticated");
+    }
+
+    // Make request with retry logic
+    return await this.makeRawRequest(path, token);
+  }
+
+  /**
    * Internal method to make HTTP request with 401 retry logic.
    */
   private async makeRequest<T>(
@@ -192,6 +216,102 @@ export class D2LApiClient {
       }
 
       return data;
+    } catch (error) {
+      // Re-throw our own errors
+      if (
+        error instanceof ApiError ||
+        error instanceof RateLimitError ||
+        error instanceof NetworkError
+      ) {
+        throw error;
+      }
+
+      // Wrap network/fetch errors
+      const message = error instanceof Error ? error.message : String(error);
+      throw new NetworkError(
+        `Request to ${path} failed: ${message}`,
+        error instanceof Error ? error : undefined,
+      );
+    }
+  }
+
+  /**
+   * Internal method to make HTTP request for raw binary data with 401 retry logic.
+   */
+  private async makeRawRequest(
+    path: string,
+    token: TokenData,
+    isRetry: boolean = false,
+  ): Promise<Response> {
+    const url = `${this.baseUrl}${path}`;
+    const headers = this.buildAuthHeaders(token);
+
+    try {
+      log("DEBUG", `${isRetry ? "Retrying" : "Requesting"} GET ${path} (raw)`);
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+
+      // Handle 401 with retry logic
+      if (response.status === 401) {
+        if (isRetry) {
+          // Second 401 - clear token and throw
+          log("DEBUG", "Second 401 response, clearing token");
+          await this.tokenManager.clearToken();
+          throw new ApiError(
+            401,
+            path,
+            "Session expired. Please re-authenticate via purdue-brightspace-auth CLI.",
+          );
+        }
+
+        // First 401 - try to get fresher token
+        log("DEBUG", "First 401 response, attempting retry with fresh token");
+        const freshToken = await this.tokenManager.getToken();
+
+        if (!freshToken || freshToken.accessToken === token.accessToken) {
+          // No fresher token available
+          await this.tokenManager.clearToken();
+          throw new ApiError(
+            401,
+            path,
+            "Session expired. Please re-authenticate via purdue-brightspace-auth CLI.",
+          );
+        }
+
+        // Retry with fresh token
+        return await this.makeRawRequest(path, freshToken, true);
+      }
+
+      // Handle 429 rate limiting
+      if (response.status === 429) {
+        const retryAfter = response.headers.get("Retry-After");
+        const retryAfterSeconds = retryAfter ? parseInt(retryAfter, 10) : undefined;
+        throw new RateLimitError(path, retryAfterSeconds);
+      }
+
+      // Handle 403 (common for past-semester courses or no access)
+      if (response.status === 403) {
+        const responseText = await response.text();
+        throw new ApiError(403, path, responseText);
+      }
+
+      // Handle 404 (file not found)
+      if (response.status === 404) {
+        throw new ApiError(404, path, "File not found");
+      }
+
+      // Handle other non-OK responses
+      if (!response.ok) {
+        const responseText = await response.text();
+        throw new ApiError(response.status, path, responseText);
+      }
+
+      // Return raw response for caller to process
+      return response;
     } catch (error) {
       // Re-throw our own errors
       if (
