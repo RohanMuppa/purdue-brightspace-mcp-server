@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 import { loadConfig } from "./utils/config.js";
 import { BrowserAuth, TokenManager } from "./auth/index.js";
 
@@ -36,9 +38,31 @@ async function main(): Promise<void> {
     const tokenManager = new TokenManager(config.sessionDir);
     await tokenManager.setToken(token);
 
+    // Verify session.json was actually written to disk
+    const sessionFile = path.join(config.sessionDir, "session.json");
+    try {
+      await fs.access(sessionFile);
+    } catch {
+      console.error(
+        `\nWARNING: session.json was not found at ${sessionFile} after save.`
+      );
+      console.error(
+        "Token was captured but failed to persist. Retrying save..."
+      );
+      // Retry once — the directory should already exist from the first attempt
+      await tokenManager.setToken(token);
+      try {
+        await fs.access(sessionFile);
+        console.log("Retry succeeded — session.json saved.");
+      } catch {
+        console.error("Retry failed. Check directory permissions on", config.sessionDir);
+        process.exit(1);
+      }
+    }
+
     // Print success
     console.log("\n=== Authentication successful! ===");
-    console.log(`Session saved to ${config.sessionDir}`);
+    console.log(`Session saved to ${sessionFile}`);
     console.log("\nThe MCP server will use this token automatically.");
     console.log("You can now add the server to your Claude Desktop configuration.\n");
 

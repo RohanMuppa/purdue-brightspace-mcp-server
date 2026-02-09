@@ -50,7 +50,7 @@ export function sanitizeError(error: unknown): CallToolResult {
     }
     if (error.status === 401) {
       return errorResponse(
-        "Authentication expired. Run `purdue-brightspace-auth` to re-authenticate."
+        "Authentication expired. Please run `purdue-brightspace-auth` in your terminal to re-authenticate, then try again."
       );
     }
     if (error.status === 403) {

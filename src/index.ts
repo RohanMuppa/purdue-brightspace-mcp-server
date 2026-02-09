@@ -65,7 +65,10 @@ async function main(): Promise<void> {
       {
         title: "Check Authentication Status",
         description:
-          "Check if you are authenticated with Purdue Brightspace. Run the purdue-brightspace-auth CLI first to authenticate. Use this when the user asks if they're logged in, if authentication is working, or when other tools return auth errors.",
+          "Check if you are authenticated with Purdue Brightspace. " +
+          "Run the purdue-brightspace-auth CLI first to authenticate. " +
+          "Use this when the user asks if they're logged in, if authentication is working, " +
+          "or when other tools return auth errors.",
       },
       async () => {
         log("DEBUG", "check_auth tool called");
@@ -78,7 +81,9 @@ async function main(): Promise<void> {
             content: [
               {
                 type: "text",
-                text: "Not authenticated. Run `purdue-brightspace-auth` to login.",
+                text: "Not authenticated. Please run the `purdue-brightspace-auth` command in your terminal to log in to Purdue Brightspace. " +
+                  "After authenticating, come back here and try again. " +
+                  "If you've already run it and still see this, your session may have expired — just re-run the auth command.",
               },
             ],
           };
