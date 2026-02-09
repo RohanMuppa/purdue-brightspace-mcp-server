@@ -51,22 +51,27 @@ export class BrowserAuth {
 
       // If already authenticated via cookies, Bearer tokens won't appear in
       // normal page requests. Try strategies to extract a usable token.
+      // Each strategy validates the token against /users/whoami before accepting.
       if (alreadyAuthenticated) {
         log("INFO", "Session cookies active — trying to extract API token");
 
         // Strategy 0: Try extracting Bearer token from localStorage (fastest)
         const localStorageToken = await this.extractLocalStorageToken(page);
         if (localStorageToken) {
-          log("INFO", "Extracted Bearer token from localStorage");
-          const now = Date.now();
-          const tokenData: TokenData = {
-            accessToken: localStorageToken,
-            capturedAt: now,
-            expiresAt: now + this.config.tokenTtl * 1000,
-            source: "browser",
-          };
-          await this.saveStorageState(context);
-          return tokenData;
+          const valid = await this.validateToken(localStorageToken);
+          if (valid) {
+            log("INFO", "Extracted valid Bearer token from localStorage");
+            const now = Date.now();
+            const tokenData: TokenData = {
+              accessToken: localStorageToken,
+              capturedAt: now,
+              expiresAt: now + this.config.tokenTtl * 1000,
+              source: "browser",
+            };
+            await this.saveStorageState(context);
+            return tokenData;
+          }
+          log("WARN", "localStorage Bearer token failed validation, trying next strategy");
         }
 
         // Strategy 1: Navigate to API endpoint to trigger Bearer-bearing requests
@@ -83,35 +88,43 @@ export class BrowserAuth {
         // Strategy 2: Try extracting XSRF token from D2L's JavaScript context
         const xsrfToken = await this.extractXsrfToken(page);
         if (xsrfToken) {
-          log("INFO", "Extracted XSRF token from page context");
-          const now = Date.now();
-          const tokenData: TokenData = {
-            accessToken: xsrfToken,
-            capturedAt: now,
-            expiresAt: now + this.config.tokenTtl * 1000,
-            source: "browser",
-          };
-          await this.saveStorageState(context);
-          return tokenData;
+          const valid = await this.validateToken(xsrfToken);
+          if (valid) {
+            log("INFO", "Extracted valid XSRF token from page context");
+            const now = Date.now();
+            const tokenData: TokenData = {
+              accessToken: xsrfToken,
+              capturedAt: now,
+              expiresAt: now + this.config.tokenTtl * 1000,
+              source: "browser",
+            };
+            await this.saveStorageState(context);
+            return tokenData;
+          }
+          log("WARN", "XSRF token failed validation, trying next strategy");
         }
 
         // Strategy 3: Extract session cookies for cookie-based API auth
         const cookieToken = await this.extractCookieToken(context);
         if (cookieToken) {
-          log("INFO", "Extracted session cookie for API auth");
-          const now = Date.now();
-          const tokenData: TokenData = {
-            accessToken: cookieToken,
-            capturedAt: now,
-            expiresAt: now + this.config.tokenTtl * 1000,
-            source: "browser",
-          };
-          await this.saveStorageState(context);
-          return tokenData;
+          const valid = await this.validateToken(cookieToken);
+          if (valid) {
+            log("INFO", "Extracted valid session cookie for API auth");
+            const now = Date.now();
+            const tokenData: TokenData = {
+              accessToken: cookieToken,
+              capturedAt: now,
+              expiresAt: now + this.config.tokenTtl * 1000,
+              source: "browser",
+            };
+            await this.saveStorageState(context);
+            return tokenData;
+          }
+          log("WARN", "Cookie token failed validation, trying next strategy");
         }
 
         // Strategy 4: Clear cookies and force full re-login through SSO
-        log("WARN", "Could not extract token from existing session, forcing re-login");
+        log("WARN", "Could not extract valid token from existing session, forcing re-login");
         await context.clearCookies();
         // Close the old page and open a fresh one to kill any in-flight
         // Brightspace redirects that would interrupt our next navigation
@@ -160,6 +173,45 @@ export class BrowserAuth {
         log("DEBUG", "Closing browser context");
         await context.close();
       }
+    }
+  }
+
+  /**
+   * Validate a token by making a test API call to /users/whoami.
+   * Returns true if the token is accepted by D2L, false otherwise.
+   */
+  private async validateToken(token: string): Promise<boolean> {
+    try {
+      const headers: Record<string, string> = {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      };
+
+      if (token.startsWith("cookie:")) {
+        headers["Cookie"] = token.substring(7);
+      } else {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `${this.config.baseUrl}/d2l/api/lp/1.45/users/whoami`,
+        {
+          method: "GET",
+          headers,
+          signal: AbortSignal.timeout(10000),
+        }
+      );
+
+      if (response.ok) {
+        log("DEBUG", "Token validation succeeded (whoami returned 200)");
+        return true;
+      }
+
+      log("DEBUG", `Token validation failed: HTTP ${response.status}`);
+      return false;
+    } catch (error) {
+      log("DEBUG", "Token validation error", error);
+      return false;
     }
   }
 
