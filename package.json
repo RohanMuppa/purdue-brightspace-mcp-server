@@ -23,6 +23,7 @@
     "playwright": "^1.58.2",
     "sanitize-filename": "^1.6.3",
     "turndown": "^7.2.2",
+    "unpdf": "^1.4.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
