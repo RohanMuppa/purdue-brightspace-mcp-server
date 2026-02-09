@@ -75,7 +75,21 @@ npm run build
 
 This compiles the TypeScript code. It should complete in a few seconds.
 
+### Step 4: Link the CLI tools
+
+```bash
+npm link
+```
+
+This registers the `purdue-brightspace-auth` command globally so you can run it from anywhere.
+
 ### Step 5: Authenticate with Brightspace
+
+```bash
+purdue-brightspace-auth
+```
+
+Or if you prefer, you can also run it with npm:
 
 ```bash
 npm run auth
@@ -88,7 +102,7 @@ npm run auth
 
 **Note:** You only need to do this once. The session lasts about 1 hour. When it expires, just run `npm run auth` again.
 
-### Step 6: Configure your MCP client
+### Step 6: Configure Claude Desktop
 
 The setup below uses Claude Desktop as an example, but this server works with any MCP client.
 
@@ -200,7 +214,7 @@ Your Brightspace session expires after about 1 hour. When it does, the server wi
 
 To log in again:
 ```bash
-npm run auth
+purdue-brightspace-auth
 ```
 
 You don't need to restart your MCP client after re-authenticating.
@@ -208,7 +222,7 @@ You don't need to restart your MCP client after re-authenticating.
 ## Troubleshooting
 
 **"Not authenticated" error**
-- **Solution**: Run `npm run auth` in the project directory. The browser will open and you'll log in again.
+- **Solution**: Run `purdue-brightspace-auth` (or `npm run auth` in the project directory). The browser will open and you'll log in again.
 
 **MCP client doesn't respond to Brightspace queries**
 - **Solution 1**: Restart your MCP client completely (quit and reopen, not just close the window).
