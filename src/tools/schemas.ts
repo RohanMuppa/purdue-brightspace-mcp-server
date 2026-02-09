@@ -54,6 +54,13 @@ export const DownloadFileSchema = z.object({
     .describe("Absolute path to the directory where the file should be saved."),
 });
 
+export const GetSyllabusSchema = z.object({
+  courseId: z.number().int().positive()
+    .describe("Course ID to get syllabus for."),
+  downloadPath: z.string().min(1).optional()
+    .describe("Absolute path to the directory where the attachment should be saved."),
+});
+
 export const GetRosterSchema = z.object({
   courseId: z.number().int().positive()
     .describe("Course ID to get roster for."),

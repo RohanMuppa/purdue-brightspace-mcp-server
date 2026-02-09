@@ -16,6 +16,7 @@ import {
   registerDownloadFile,
   registerGetClasslistEmails,
   registerGetRoster,
+  registerGetSyllabus,
 } from "./tools/index.js";
 
 // CRITICAL: Enable stdout guard IMMEDIATELY to prevent corruption of stdio transport
@@ -54,10 +55,8 @@ async function main(): Promise<void> {
       log("INFO", "D2L API Client initialized");
     } catch (error) {
       log("ERROR", "Failed to initialize D2L API Client", error);
-      log(
-        "WARN",
-        "MCP server will start but tools may not work. Check your connection to Brightspace."
-      );
+      log("ERROR", "MCP server cannot start without API initialization. Exiting.");
+      process.exit(1);
     }
 
     // Register check_auth tool (no input schema needed for zero-argument tool)
@@ -120,13 +119,14 @@ async function main(): Promise<void> {
     registerDownloadFile(server, apiClient);
     registerGetClasslistEmails(server, apiClient);
     registerGetRoster(server, apiClient);
-    log("DEBUG", "MCP tools registered (9 core tools, total 10 with check_auth)");
+    registerGetSyllabus(server, apiClient);
+    log("DEBUG", "MCP tools registered (10 core tools, total 11 with check_auth)");
 
     // Connect stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
 
-    log("INFO", "Purdue Brightspace MCP Server running on stdio (10 tools registered)");
+    log("INFO", "Purdue Brightspace MCP Server running on stdio (11 tools registered)");
     log("INFO", "Claude Desktop setup: see claude-desktop-config.example.json in the project root");
   } catch (error) {
     log("ERROR", "MCP Server failed to start", error);
