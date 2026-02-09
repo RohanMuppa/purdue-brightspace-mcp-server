@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
+    "dotenv": "^17.2.4",
     "file-type": "^21.3.0",
     "otpauth": "^9.5.0",
     "playwright": "^1.58.2",

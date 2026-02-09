@@ -40,7 +40,7 @@ export function registerGetSyllabus(
         if (downloadPath !== undefined) {
           if (!path.isAbsolute(downloadPath)) {
             return errorResponse(
-              "Download path must be an absolute path (e.g., /Users/username/Downloads)"
+              "Download path must be an absolute path (e.g., /Users/username/Downloads on Mac or C:\\Users\\username\\Downloads on Windows)"
             );
           }
           try {

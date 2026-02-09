@@ -2,8 +2,12 @@
 
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import dotenv from "dotenv";
 import { loadConfig } from "./utils/config.js";
 import { BrowserAuth, TokenManager } from "./auth/index.js";
+
+// Load .env file so credentials are available via process.env
+dotenv.config({ quiet: true });
 
 async function main(): Promise<void> {
   try {

@@ -232,6 +232,11 @@ You don't need to restart your MCP client after re-authenticating.
 **Browser doesn't open during authentication**
 - **Solution**: Make sure you have a default browser set. Try running `npm run auth` again. If it still doesn't work, check that Chromium was installed correctly with `npx playwright install chromium`.
 
+**Authentication fails on Windows**
+- **Solution 1**: Make sure your `.env` file is in the project root directory (same folder as `package.json`) with your credentials filled in. The auth CLI reads credentials from this file.
+- **Solution 2**: Run `npm run auth` from the project directory (not `purdue-brightspace-auth` globally) to ensure the `.env` file is found.
+- **Solution 3**: If Chromium fails to install, run `npx playwright install chromium` manually.
+
 ## Security
 
 - Your Purdue credentials are never stored in this repository or in the code.

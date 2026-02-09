@@ -42,7 +42,7 @@ export function registerDownloadFile(
         // Validate download path is absolute
         if (!path.isAbsolute(downloadPath)) {
           return errorResponse(
-            "Download path must be an absolute path (e.g., /Users/username/Downloads)"
+            "Download path must be an absolute path (e.g., /Users/username/Downloads on Mac or C:\\Users\\username\\Downloads on Windows)"
           );
         }
 
