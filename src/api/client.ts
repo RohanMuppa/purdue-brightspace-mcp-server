@@ -26,6 +26,7 @@ export class D2LApiClient {
   private readonly rateLimiter: TokenBucket;
   private readonly cacheTTLs: CacheTTLs;
   private readonly timeoutMs: number;
+  private readonly onAuthExpired?: () => Promise<boolean>;
   private versions: ApiVersions | null = null;
 
   constructor(options: D2LApiClientOptions) {
@@ -40,6 +41,7 @@ export class D2LApiClient {
     this.baseUrl = options.baseUrl.replace(/\/$/, "");
     this.tokenManager = options.tokenManager;
     this.timeoutMs = options.timeoutMs ?? 30_000;
+    this.onAuthExpired = options.onAuthExpired;
 
     // Merge user-provided TTLs with defaults
     this.cacheTTLs = { ...DEFAULT_CACHE_TTLS, ...options.cacheTTLs };
@@ -102,14 +104,23 @@ export class D2LApiClient {
     // Enforce rate limit
     await this.rateLimiter.consume();
 
-    // Get authentication token
-    const token = await this.tokenManager.getToken();
+    // Get authentication token — auto-reauth if expired
+    let token = await this.tokenManager.getToken();
     if (!token) {
-      throw new ApiError(401, path, "Not authenticated");
+      token = await this.tryAutoReauth(path);
     }
 
     // Make request with retry logic
-    return await this.makeRequest<T>(path, token, options);
+    try {
+      return await this.makeRequest<T>(path, token, options);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        // Final attempt: auto-reauth and retry once
+        const freshToken = await this.tryAutoReauth(path);
+        return await this.makeRequest<T>(path, freshToken, options);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -126,14 +137,43 @@ export class D2LApiClient {
     // Enforce rate limit
     await this.rateLimiter.consume();
 
-    // Get authentication token
-    const token = await this.tokenManager.getToken();
+    // Get authentication token — auto-reauth if expired
+    let token = await this.tokenManager.getToken();
     if (!token) {
-      throw new ApiError(401, path, "Not authenticated");
+      token = await this.tryAutoReauth(path);
     }
 
     // Make request with retry logic
-    return await this.makeRawRequest(path, token);
+    try {
+      return await this.makeRawRequest(path, token);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        // Final attempt: auto-reauth and retry once
+        const freshToken = await this.tryAutoReauth(path);
+        return await this.makeRawRequest(path, freshToken);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Attempt auto-reauthentication via the onAuthExpired callback.
+   * If successful, returns the fresh token. Otherwise throws 401 ApiError.
+   */
+  private async tryAutoReauth(path: string): Promise<TokenData> {
+    if (this.onAuthExpired) {
+      log("INFO", "Attempting auto-reauthentication...");
+      const success = await this.onAuthExpired();
+      if (success) {
+        const freshToken = await this.tokenManager.getToken();
+        if (freshToken) {
+          log("INFO", "Auto-reauthentication succeeded, retrying request");
+          return freshToken;
+        }
+      }
+      log("WARN", "Auto-reauthentication did not produce a valid token");
+    }
+    throw new ApiError(401, path, "Session expired. Please re-authenticate via purdue-brightspace-auth CLI.");
   }
 
   /**

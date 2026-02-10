@@ -4,7 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { enableStdoutGuard, log } from "./utils/logger.js";
 import { loadConfig } from "./utils/config.js";
-import { TokenManager } from "./auth/index.js";
+import { TokenManager, AuthRunner } from "./auth/index.js";
 import { D2LApiClient } from "./api/index.js";
 import {
   registerGetMyCourses,
@@ -43,10 +43,14 @@ async function main(): Promise<void> {
     // Create TokenManager for reading cached tokens
     const tokenManager = new TokenManager(config.sessionDir);
 
-    // Create D2L API Client
+    // Create AuthRunner for auto-reauthentication
+    const authRunner = new AuthRunner();
+
+    // Create D2L API Client with auto-reauth support
     const apiClient = new D2LApiClient({
       baseUrl: config.baseUrl,
       tokenManager,
+      onAuthExpired: () => authRunner.run(),
     });
 
     // Initialize API client (discover API versions)
@@ -73,20 +77,31 @@ async function main(): Promise<void> {
       async () => {
         log("DEBUG", "check_auth tool called");
 
-        const token = await tokenManager.getToken();
+        let token = await tokenManager.getToken();
 
         if (!token) {
-          log("INFO", "check_auth: No valid token found");
-          return {
-            content: [
-              {
-                type: "text",
-                text: "Not authenticated. Please run the `purdue-brightspace-auth` command in your terminal to log in to Purdue Brightspace. " +
-                  "After authenticating, come back here and try again. " +
-                  "If you've already run it and still see this, your session may have expired — just re-run the auth command.",
-              },
-            ],
-          };
+          log("INFO", "check_auth: No valid token, attempting auto-reauthentication...");
+
+          const success = await authRunner.run();
+          if (success) {
+            token = await tokenManager.getToken();
+          }
+
+          if (!token) {
+            log("INFO", "check_auth: Auto-reauthentication failed or produced no valid token");
+            return {
+              content: [
+                {
+                  type: "text",
+                  text: "Not authenticated. Auto-reauthentication was attempted but failed. " +
+                    "Please run `purdue-brightspace-auth` manually in your terminal to log in. " +
+                    "Make sure your credentials in .env are correct and your internet connection is stable.",
+                },
+              ],
+            };
+          }
+
+          log("INFO", "check_auth: Auto-reauthentication succeeded");
         }
 
         const expiresIn = Math.round((token.expiresAt - Date.now()) / 1000 / 60);

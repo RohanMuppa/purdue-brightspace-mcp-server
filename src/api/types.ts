@@ -42,6 +42,8 @@ export interface D2LApiClientOptions {
   cacheTTLs?: Partial<CacheTTLs>;
   rateLimitConfig?: RateLimitConfig;
   timeoutMs?: number; // default 30_000
+  /** Called when auth is expired and retries are exhausted. Return true if re-auth succeeded. */
+  onAuthExpired?: () => Promise<boolean>;
 }
 
 // Re-export TokenData from shared types for convenience
