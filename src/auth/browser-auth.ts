@@ -1,3 +1,9 @@
+/**
+ * Purdue Brightspace MCP Server
+ * Copyright (c) 2025 Rohan Muppa. All rights reserved.
+ * Licensed under AGPL-3.0 — see LICENSE file for details.
+ */
+
 import { chromium } from "playwright";
 import type { BrowserContext, Page } from "playwright";
 import * as path from "node:path";

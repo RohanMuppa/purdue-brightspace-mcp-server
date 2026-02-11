@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+/**
+ * Purdue Brightspace MCP Server
+ * Copyright (c) 2025 Rohan Muppa. All rights reserved.
+ * Licensed under AGPL-3.0 — see LICENSE file for details.
+ *
+ * https://github.com/rohanmuppa/purdue-brightspace-mcp
+ */
 
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
@@ -15,7 +22,7 @@ async function main(): Promise<void> {
     const config = loadConfig();
 
     // Print header
-    console.log("\n=== Purdue Brightspace Authentication ===\n");
+    console.log("\n=== Purdue Brightspace Authentication — by Rohan Muppa ===\n");
 
     // Check for credentials and provide status
     if (config.username && config.password) {

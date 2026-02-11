@@ -1,3 +1,9 @@
+/**
+ * Purdue Brightspace MCP Server
+ * Copyright (c) 2025 Rohan Muppa. All rights reserved.
+ * Licensed under AGPL-3.0 — see LICENSE file for details.
+ */
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { D2LApiClient, DEFAULT_CACHE_TTLS } from "../api/index.js";
 import { GetCourseContentSchema } from "./schemas.js";

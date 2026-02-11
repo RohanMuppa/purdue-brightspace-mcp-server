@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+/**
+ * Purdue Brightspace MCP Server
+ * Copyright (c) 2025 Rohan Muppa. All rights reserved.
+ * Licensed under AGPL-3.0 — see LICENSE file for details.
+ *
+ * https://github.com/rohanmuppa/purdue-brightspace-mcp
+ */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -37,6 +44,7 @@ async function main(): Promise<void> {
     const server = new McpServer({
       name: "purdue-brightspace",
       version: "1.0.0",
+      description: "Purdue Brightspace MCP Server by Rohan Muppa",
     });
     log("DEBUG", "MCP Server instance created");
 
@@ -146,7 +154,7 @@ async function main(): Promise<void> {
     const transport = new StdioServerTransport();
     await server.connect(transport);
 
-    log("INFO", "Purdue Brightspace MCP Server running on stdio (11 tools registered)");
+    log("INFO", "Purdue Brightspace MCP Server by Rohan Muppa — running on stdio (11 tools registered)");
     log("INFO", "Claude Desktop setup: see claude-desktop-config.example.json in the project root");
   } catch (error) {
     log("ERROR", "MCP Server failed to start", error);

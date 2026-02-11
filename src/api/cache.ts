@@ -1,3 +1,9 @@
+/**
+ * Purdue Brightspace MCP Server
+ * Copyright (c) 2025 Rohan Muppa. All rights reserved.
+ * Licensed under AGPL-3.0 — see LICENSE file for details.
+ */
+
 // In-memory TTL cache using Map + setTimeout
 // No disk persistence per user decision
 

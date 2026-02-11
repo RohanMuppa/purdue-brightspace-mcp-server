@@ -1,3 +1,9 @@
+/**
+ * Purdue Brightspace MCP Server
+ * Copyright (c) 2025 Rohan Muppa. All rights reserved.
+ * Licensed under AGPL-3.0 — see LICENSE file for details.
+ */
+
 // Tool registration functions - barrel export
 export { registerGetMyCourses } from "./get-my-courses.js";
 export { registerGetUpcomingDueDates } from "./get-upcoming-due-dates.js";

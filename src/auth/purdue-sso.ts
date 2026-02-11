@@ -1,3 +1,9 @@
+/**
+ * Purdue Brightspace MCP Server
+ * Copyright (c) 2025 Rohan Muppa. All rights reserved.
+ * Licensed under AGPL-3.0 — see LICENSE file for details.
+ */
+
 import type { Page } from "playwright";
 import * as OTPAuth from "otpauth";
 import { BrowserAuthError } from "../utils/errors.js";
