@@ -6,3 +6,4 @@ build/
 .claude/
 .DS_Store
 .mcp.json
+FINGERPRINTS.md

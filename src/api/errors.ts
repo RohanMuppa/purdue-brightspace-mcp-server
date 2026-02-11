@@ -15,7 +15,7 @@ export class ApiError extends AuthError {
     public readonly responseBody?: string,
     cause?: Error,
   ) {
-    super(`API error (${status}) at ${endpoint}: ${message}`, cause);
+    super(`[PBMCP-2001] API error (${status}) at ${endpoint}: ${message}`, cause);
     this.name = "ApiError";
   }
 }
@@ -41,8 +41,8 @@ export class RateLimitError extends ApiError {
     public readonly retryAfter?: number, // seconds
   ) {
     const message = retryAfter
-      ? `Rate limited, retry after ${retryAfter}s`
-      : "Rate limited";
+      ? `[PBMCP-2002] Rate limited, retry after ${retryAfter}s`
+      : "[PBMCP-2002] Rate limited";
     super(429, endpoint, message);
     this.name = "RateLimitError";
   }
@@ -52,7 +52,7 @@ export class RateLimitError extends ApiError {
 // For fetch failures, timeouts, DNS errors
 export class NetworkError extends AuthError {
   constructor(message: string, cause?: Error) {
-    super(`Network error: ${message}`, cause);
+    super(`[PBMCP-2003] Network error: ${message}`, cause);
     this.name = "NetworkError";
   }
 }

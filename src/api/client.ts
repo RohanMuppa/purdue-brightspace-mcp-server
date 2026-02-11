@@ -384,7 +384,7 @@ export class D2LApiClient {
   private buildAuthHeaders(token: TokenData): Record<string, string> {
     const headers: Record<string, string> = {
       "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "PurdueBrightspaceMCP/1.0 (Rohan Muppa; github.com/rohanmuppa/purdue-brightspace-mcp)",
     };
 
     // Auto-detect cookie vs Bearer auth based on "cookie:" prefix
