@@ -3,7 +3,8 @@ build/
 .env
 *.d2l-session*
 .planning/
-.claude/
+.claude/*
+!.claude/commands/
 .DS_Store
 .mcp.json
 FINGERPRINTS.md
