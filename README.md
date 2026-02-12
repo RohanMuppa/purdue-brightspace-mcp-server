@@ -32,7 +32,7 @@ Access your Purdue Brightspace courses using natural language. Get grades, due d
 Open Terminal (Mac) or Command Prompt (Windows) and run:
 
 ```bash
-git clone https://github.com/username/purdue-brightspace-mcp.git
+git clone https://github.com/RohanMuppa/purdue-brightspace-mcp.git
 cd purdue-brightspace-mcp
 ```
 
