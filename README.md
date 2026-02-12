@@ -261,4 +261,4 @@ Found a bug or have a feature request? Open an issue on GitHub!
 
 ## License
 
-MIT
+AGPL-3.0
