@@ -93,16 +93,19 @@ export function registerGetUpcomingDueDates(
           orgUnitIds = filteredEnrollments.map((e) => e.id).join(",");
         }
 
+        log("DEBUG", `get_upcoming_due_dates: querying orgUnitIds=${orgUnitIds}, window=${startDateTime} to ${endDateTime}`);
+
         // Build path
         const path = apiClient.leGlobal(
           `/calendar/events/myEvents/?startDateTime=${encodeURIComponent(startDateTime)}&endDateTime=${encodeURIComponent(endDateTime)}&orgUnitIdsCSV=${orgUnitIds}`
         );
 
-        // Fetch events (D2L returns ObjectListPage wrapper)
-        const response = await apiClient.get<{ Items: EventDataInfo[] }>(path, {
+        // Fetch events — D2L returns ObjectListPage wrapper with "Objects" array (NOT "Items")
+        const response = await apiClient.get<{ Objects: EventDataInfo[]; Next: string | null }>(path, {
           ttl: DEFAULT_CACHE_TTLS.assignments,
         });
-        const events = response.Items ?? [];
+        const events = response.Objects ?? [];
+        log("DEBUG", `get_upcoming_due_dates: raw response keys=${Object.keys(response).join(",")}, event count=${events.length}`);
 
         // Map to clean objects and sort by end date (soonest due first)
         const mappedEvents = events

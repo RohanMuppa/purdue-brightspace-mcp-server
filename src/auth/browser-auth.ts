@@ -32,9 +32,19 @@ export class BrowserAuth {
     try {
       log("INFO", "Starting browser authentication");
 
-      await fs.mkdir(this.config.sessionDir, { recursive: true });
+      const mkdirOpts: { recursive: true; mode?: number } = { recursive: true };
+      if (process.platform !== "win32") {
+        mkdirOpts.mode = 0o700;
+      }
+      await fs.mkdir(this.config.sessionDir, mkdirOpts);
 
       const browserDataDir = path.join(this.config.sessionDir, "browser-data");
+
+      // Remove stale Chromium lock files that can block persistent context launch.
+      // On Windows, if the browser is killed by antivirus or force-closed, these
+      // lock files persist and prevent all future auth attempts.
+      await this.clearStaleLockFiles(browserDataDir);
+
       context = await chromium.launchPersistentContext(browserDataDir, {
         headless: this.config.headless,
         viewport: { width: 1280, height: 720 },
@@ -168,16 +178,34 @@ export class BrowserAuth {
       log("INFO", "Authentication complete");
       return tokenData;
     } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
       log("ERROR", "Browser authentication failed", error);
+
+      // Provide Windows-specific troubleshooting hints
+      let hint = "";
+      if (process.platform === "win32") {
+        if (errMsg.includes("Target page, context or browser has been closed")) {
+          hint = " (Windows hint: antivirus or firewall may be closing the browser. Try adding Chromium to your exclusion list.)";
+        } else if (errMsg.includes("EPERM") || errMsg.includes("EACCES")) {
+          hint = " (Windows hint: try running as Administrator, or check that no other process has locked the session directory.)";
+        }
+      }
+
       throw new BrowserAuthError(
-        "Authentication failed",
+        `Authentication failed${hint}`,
         "authenticate",
         error as Error
       );
     } finally {
       if (context) {
         log("DEBUG", "Closing browser context");
-        await context.close();
+        try {
+          await context.close();
+        } catch (closeError) {
+          // Context may already be closed (e.g. browser crashed or was closed externally).
+          // This is common on Windows where the browser process can terminate unexpectedly.
+          log("DEBUG", "Browser context already closed or failed to close", closeError);
+        }
       }
     }
   }
@@ -504,22 +532,34 @@ export class BrowserAuth {
       if (state.origins && state.origins.length > 0) {
         for (const origin of state.origins) {
           if (origin.localStorage && origin.localStorage.length > 0) {
-            // Create a temporary page to set localStorage
-            const tempPage = await context.newPage();
-            await tempPage.goto(origin.origin);
+            let tempPage: Page | null = null;
+            try {
+              // Create a temporary page to set localStorage
+              tempPage = await context.newPage();
+              await tempPage.goto(origin.origin, { timeout: 10000 });
 
-            // Set each localStorage item
-            await tempPage.evaluate((items) => {
-              for (const item of items) {
-                localStorage.setItem(item.name, item.value);
+              // Set each localStorage item
+              await tempPage.evaluate((items) => {
+                for (const item of items) {
+                  localStorage.setItem(item.name, item.value);
+                }
+              }, origin.localStorage);
+
+              log(
+                "INFO",
+                `Restored ${origin.localStorage.length} localStorage items for ${origin.origin}`
+              );
+            } catch (originError) {
+              log("WARN", `Failed to restore localStorage for ${origin.origin}`, originError);
+            } finally {
+              if (tempPage) {
+                try {
+                  await tempPage.close();
+                } catch {
+                  // Page may already be closed
+                }
               }
-            }, origin.localStorage);
-
-            await tempPage.close();
-            log(
-              "INFO",
-              `Restored ${origin.localStorage.length} localStorage items for ${origin.origin}`
-            );
+            }
           }
         }
       }
@@ -540,6 +580,24 @@ export class BrowserAuth {
       log("DEBUG", `Storage state saved to ${storageStatePath}`);
     } catch (error) {
       log("WARN", "Failed to save storage state", error);
+    }
+  }
+
+  /**
+   * Remove stale Chromium lock files from the browser data directory.
+   * Playwright's persistent context uses Chromium's SingletonLock mechanism.
+   * If the browser is killed unexpectedly (antivirus, force close, crash),
+   * these lock files persist and block all future launch attempts.
+   */
+  private async clearStaleLockFiles(browserDataDir: string): Promise<void> {
+    const lockFiles = ["SingletonLock", "SingletonCookie", "SingletonSocket"];
+    for (const lockFile of lockFiles) {
+      try {
+        await fs.unlink(path.join(browserDataDir, lockFile));
+        log("WARN", `Removed stale lock file: ${lockFile}`);
+      } catch {
+        // File doesn't exist — expected in normal operation
+      }
     }
   }
 }

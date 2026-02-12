@@ -5,12 +5,14 @@
   "main": "build/index.js",
   "bin": {
     "purdue-brightspace-mcp": "build/index.js",
-    "purdue-brightspace-auth": "build/auth-cli.js"
+    "purdue-brightspace-auth": "build/auth-cli.js",
+    "purdue-brightspace-update": "build/update.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
     "auth": "node build/auth-cli.js",
+    "update": "node build/update.js",
     "dev": "tsc --watch",
     "test": "vitest",
     "test:run": "vitest run",
