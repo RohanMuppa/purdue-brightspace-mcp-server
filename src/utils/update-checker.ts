@@ -47,7 +47,7 @@ export function initUpdateChecker(): void {
 
       if (count > 0) {
         const plural = count === 1 ? "" : "s";
-        pendingNotice = `\n\n---\nUpdate available: ${count} new commit${plural} on the Purdue Brightspace MCP server. Ask me to 'check for updates' to see details and install, or run \`npm run update\` in your terminal.`;
+        pendingNotice = `\n\n---\nUpdate available: ${count} new commit${plural}. Ask me to 'check for updates' to see details and install, or run \`purdue-brightspace-update\` in your terminal.`;
       } else {
         pendingNotice = null;
       }
