@@ -13,6 +13,7 @@ import { enableStdoutGuard, log } from "./utils/logger.js";
 import { loadConfig } from "./utils/config.js";
 import { TokenManager, AuthRunner } from "./auth/index.js";
 import { D2LApiClient } from "./api/index.js";
+import { initUpdateChecker, getUpdateNotice } from "./utils/update-checker.js";
 import {
   registerGetMyCourses,
   registerGetUpcomingDueDates,
@@ -72,6 +73,10 @@ async function main(): Promise<void> {
       process.exit(1);
     }
 
+    // Start background update check (fire and forget)
+    initUpdateChecker();
+    log("DEBUG", "Background update check initiated");
+
     // Register check_auth tool (no input schema needed for zero-argument tool)
     server.registerTool(
       "check_auth",
@@ -98,16 +103,23 @@ async function main(): Promise<void> {
 
           if (!token) {
             log("INFO", "check_auth: Auto-reauthentication failed or produced no valid token");
-            return {
-              content: [
-                {
-                  type: "text",
-                  text: "Not authenticated. Auto-reauthentication was attempted but failed. " +
-                    "Please run `purdue-brightspace-auth` manually in your terminal to log in. " +
-                    "Make sure your credentials in .env are correct and your internet connection is stable.",
-                },
-              ],
-            };
+
+            // Build response with update notice if available
+            const content: Array<{ type: "text"; text: string }> = [
+              {
+                type: "text",
+                text: "Not authenticated. Auto-reauthentication was attempted but failed. " +
+                  "Please run `purdue-brightspace-auth` manually in your terminal to log in. " +
+                  "Make sure your credentials in .env are correct and your internet connection is stable.",
+              },
+            ];
+
+            const notice = getUpdateNotice();
+            if (notice) {
+              content.push({ type: "text", text: notice });
+            }
+
+            return { content };
           }
 
           log("INFO", "check_auth: Auto-reauthentication succeeded");
@@ -116,14 +128,20 @@ async function main(): Promise<void> {
         const expiresIn = Math.round((token.expiresAt - Date.now()) / 1000 / 60);
         log("INFO", `check_auth: Token valid, expires in ~${expiresIn} minutes`);
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Authenticated with Purdue Brightspace. Token expires in ~${expiresIn} minutes. Source: ${token.source}.`,
-            },
-          ],
-        };
+        // Build response with update notice if available
+        const content: Array<{ type: "text"; text: string }> = [
+          {
+            type: "text",
+            text: `Authenticated with Purdue Brightspace. Token expires in ~${expiresIn} minutes. Source: ${token.source}.`,
+          },
+        ];
+
+        const notice = getUpdateNotice();
+        if (notice) {
+          content.push({ type: "text", text: notice });
+        }
+
+        return { content };
       }
     );
 
