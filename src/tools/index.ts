@@ -15,7 +15,6 @@ export { registerDownloadFile } from "./download-file.js";
 export { registerGetClasslistEmails } from "./get-classlist-emails.js";
 export { registerGetRoster } from "./get-roster.js";
 export { registerGetSyllabus } from "./get-syllabus.js";
-export { registerCheckForUpdates } from "./check-for-updates.js";
 
 // Re-export shared helpers and schemas for convenience
 export { toolResponse, errorResponse, sanitizeError } from "./tool-helpers.js";

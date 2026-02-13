@@ -307,10 +307,10 @@ You don't need to restart your MCP client after re-authenticating.
 To update to the latest version:
 
 ```bash
-npm run update
+purdue-brightspace-update
 ```
 
-Or if you linked the CLI tools: `purdue-brightspace-update`. This pulls the latest code, installs any new dependencies, and rebuilds automatically. Restart your MCP client after updating.
+This pulls the latest code, installs any new dependencies, and rebuilds automatically. Restart your MCP client after updating.
 
 ## Troubleshooting
 

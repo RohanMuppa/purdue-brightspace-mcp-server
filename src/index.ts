@@ -25,7 +25,6 @@ import {
   registerGetClasslistEmails,
   registerGetRoster,
   registerGetSyllabus,
-  registerCheckForUpdates,
 } from "./tools/index.js";
 
 // CRITICAL: Enable stdout guard IMMEDIATELY to prevent corruption of stdio transport
@@ -75,7 +74,6 @@ async function main(): Promise<void> {
 
     // Start background update check (fire and forget)
     initUpdateChecker();
-    log("DEBUG", "Background update check initiated");
 
     // Register check_auth tool (no input schema needed for zero-argument tool)
     server.registerTool(
@@ -104,7 +102,6 @@ async function main(): Promise<void> {
           if (!token) {
             log("INFO", "check_auth: Auto-reauthentication failed or produced no valid token");
 
-            // Build response with update notice if available
             const content: Array<{ type: "text"; text: string }> = [
               {
                 type: "text",
@@ -113,12 +110,8 @@ async function main(): Promise<void> {
                   "Make sure your credentials in .env are correct and your internet connection is stable.",
               },
             ];
-
             const notice = getUpdateNotice();
-            if (notice) {
-              content.push({ type: "text", text: notice });
-            }
-
+            if (notice) content.push({ type: "text", text: notice });
             return { content };
           }
 
@@ -128,19 +121,14 @@ async function main(): Promise<void> {
         const expiresIn = Math.round((token.expiresAt - Date.now()) / 1000 / 60);
         log("INFO", `check_auth: Token valid, expires in ~${expiresIn} minutes`);
 
-        // Build response with update notice if available
         const content: Array<{ type: "text"; text: string }> = [
           {
             type: "text",
             text: `Authenticated with Purdue Brightspace. Token expires in ~${expiresIn} minutes. Source: ${token.source}.`,
           },
         ];
-
         const notice = getUpdateNotice();
-        if (notice) {
-          content.push({ type: "text", text: notice });
-        }
-
+        if (notice) content.push({ type: "text", text: notice });
         return { content };
       }
     );
@@ -167,14 +155,13 @@ async function main(): Promise<void> {
     registerGetClasslistEmails(server, apiClient);
     registerGetRoster(server, apiClient);
     registerGetSyllabus(server, apiClient);
-    registerCheckForUpdates(server);
-    log("DEBUG", "MCP tools registered (11 core tools, total 12 with check_auth)");
+    log("DEBUG", "MCP tools registered (10 core tools, total 11 with check_auth)");
 
     // Connect stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
 
-    log("INFO", "Purdue Brightspace MCP Server by Rohan Muppa — running on stdio (12 tools registered)");
+    log("INFO", "Purdue Brightspace MCP Server by Rohan Muppa — running on stdio (11 tools registered)");
     log("INFO", "Setup: see README.md for MCP client configuration (Claude Desktop, ChatGPT Desktop, Cursor, etc.)");
   } catch (error) {
     log("ERROR", "MCP Server failed to start", error);
