@@ -344,7 +344,7 @@ Found a bug or have a feature request? Open an issue on GitHub!
 
 ## License
 
-AGPL-3.0-only — Copyright (c) 2025 Rohan Muppa
+AGPL-3.0-only — Copyright (c) 2026 Rohan Muppa
 
 ## Author
 
