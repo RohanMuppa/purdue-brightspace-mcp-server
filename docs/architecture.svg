@@ -3,152 +3,155 @@
     <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
       <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.06"/>
     </filter>
-    <linearGradient id="clientGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="chatbotGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#667eea"/>
       <stop offset="100%" stop-color="#764ba2"/>
     </linearGradient>
-    <linearGradient id="serverGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="pluginGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#11998e"/>
       <stop offset="100%" stop-color="#38ef7d"/>
     </linearGradient>
-    <linearGradient id="apiGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="connectorGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f2994a"/>
       <stop offset="100%" stop-color="#f2c94c"/>
     </linearGradient>
-    <linearGradient id="authGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="loginGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eb3349"/>
       <stop offset="100%" stop-color="#f45c43"/>
     </linearGradient>
-    <linearGradient id="d2lGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bsGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#7f53ac"/>
       <stop offset="100%" stop-color="#647dee"/>
     </linearGradient>
   </defs>
 
-  <!-- ROW 1: AI CLIENT -->
-  <rect x="260" y="24" width="360" height="58" rx="29" fill="url(#clientGrad)" filter="url(#shadow)"/>
-  <text x="440" y="54" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" letter-spacing="0.3">AI Assistant</text>
+  <!-- ROW 1: AI CHATBOT -->
+  <rect x="260" y="24" width="360" height="58" rx="29" fill="url(#chatbotGrad)" filter="url(#shadow)"/>
+  <text x="440" y="54" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" letter-spacing="0.3">AI Chatbot</text>
   <text x="440" y="70" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9.5">Claude Desktop  /  ChatGPT  /  Cursor  /  Claude Code</text>
 
   <!-- Arrow 1 -->
   <line x1="440" y1="82" x2="440" y2="122" stroke="#cbd5e0" stroke-width="1.5"/>
   <polygon points="435,118 440,128 445,118" fill="#cbd5e0"/>
-  <rect x="418" y="94" width="44" height="16" rx="8" fill="#edf2f7"/>
-  <text x="440" y="105" text-anchor="middle" fill="#718096" font-size="8" font-weight="600">stdio</text>
+  <rect x="404" y="94" width="72" height="16" rx="8" fill="#edf2f7"/>
+  <text x="440" y="105" text-anchor="middle" fill="#718096" font-size="8" font-weight="600">your question</text>
 
-  <!-- ROW 2: MCP SERVER -->
+  <!-- ROW 2: BRIGHTSPACE PLUGIN -->
   <rect x="110" y="128" width="660" height="136" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
-  <rect x="110" y="128" width="660" height="34" rx="12" fill="url(#serverGrad)"/>
-  <rect x="110" y="150" width="660" height="12" fill="url(#serverGrad)"/>
-  <text x="440" y="151" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing="0.3">MCP Server</text>
-  <text x="440" y="162" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8">11 tools  ·  Zod validation  ·  rate limiting  ·  caching</text>
+  <rect x="110" y="128" width="660" height="34" rx="12" fill="url(#pluginGrad)"/>
+  <rect x="110" y="150" width="660" height="12" fill="url(#pluginGrad)"/>
+  <text x="440" y="151" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing="0.3">Brightspace Plugin</text>
+  <text x="440" y="162" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8">understands 11 types of questions about your courses</text>
 
-  <!-- Tool pills row 1 -->
-  <rect x="128" y="176" width="94" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="175" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">check_auth</text>
+  <!-- Skill pills row 1 -->
+  <rect x="128" y="176" width="88" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="172" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Check Login</text>
 
-  <rect x="228" y="176" width="106" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="281" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_my_courses</text>
+  <rect x="222" y="176" width="86" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="265" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">My Courses</text>
 
-  <rect x="340" y="176" width="98" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="389" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_my_grades</text>
+  <rect x="314" y="176" width="82" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="355" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">My Grades</text>
 
-  <rect x="444" y="176" width="92" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="490" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_due_dates</text>
+  <rect x="402" y="176" width="84" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="444" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Due Dates</text>
 
-  <rect x="542" y="176" width="114" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="599" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_announcements</text>
+  <rect x="492" y="176" width="108" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="546" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Announcements</text>
 
-  <rect x="662" y="176" width="96" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="710" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_assignments</text>
+  <rect x="606" y="176" width="96" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="654" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Assignments</text>
 
-  <!-- Tool pills row 2 -->
-  <rect x="128" y="208" width="118" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="187" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_course_content</text>
+  <!-- Skill pills row 2 -->
+  <rect x="128" y="208" width="110" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="183" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Course Content</text>
 
-  <rect x="252" y="208" width="100" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="302" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">download_file</text>
+  <rect x="244" y="208" width="106" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="297" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Download Files</text>
 
-  <rect x="358" y="208" width="82" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="399" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_roster</text>
+  <rect x="356" y="208" width="72" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="392" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Roster</text>
 
-  <rect x="446" y="208" width="84" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="488" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_syllabus</text>
+  <rect x="434" y="208" width="76" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="472" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Syllabus</text>
 
-  <rect x="536" y="208" width="126" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="599" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">get_classlist_emails</text>
+  <rect x="516" y="208" width="108" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="570" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Class Emails</text>
 
   <!-- Arrow 2 -->
   <line x1="440" y1="264" x2="440" y2="304" stroke="#cbd5e0" stroke-width="1.5"/>
   <polygon points="435,300 440,310 445,300" fill="#cbd5e0"/>
 
-  <!-- ROW 3: API CLIENT -->
+  <!-- ROW 3: CONNECTOR -->
   <rect x="170" y="310" width="540" height="64" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
-  <rect x="170" y="310" width="540" height="30" rx="12" fill="url(#apiGrad)"/>
-  <rect x="170" y="330" width="540" height="10" fill="url(#apiGrad)"/>
-  <text x="440" y="331" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing="0.3">D2L API Client</text>
+  <rect x="170" y="310" width="540" height="30" rx="12" fill="url(#connectorGrad)"/>
+  <rect x="170" y="330" width="540" height="10" fill="url(#connectorGrad)"/>
+  <text x="440" y="331" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing="0.3">Brightspace Connector</text>
 
-  <text x="250" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">TTL Cache</text>
+  <text x="255" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Caching</text>
   <text x="310" y="358" text-anchor="middle" fill="#cbd5e0" font-size="10">·</text>
-  <text x="378" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Rate Limiter</text>
+  <text x="375" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Speed Limits</text>
   <text x="444" y="358" text-anchor="middle" fill="#cbd5e0" font-size="10">·</text>
-  <text x="520" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Token Manager</text>
-  <text x="590" y="358" text-anchor="middle" fill="#cbd5e0" font-size="10">·</text>
-  <text x="654" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Auth Headers</text>
+  <text x="530" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Session Management</text>
+  <text x="620" y="358" text-anchor="middle" fill="#cbd5e0" font-size="10">·</text>
+  <text x="670" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Security</text>
 
   <!-- Arrow 3 -->
   <line x1="440" y1="374" x2="440" y2="418" stroke="#cbd5e0" stroke-width="1.5"/>
   <polygon points="435,414 440,424 445,414" fill="#cbd5e0"/>
-  <rect x="416" y="388" width="48" height="16" rx="8" fill="#edf2f7"/>
-  <text x="440" y="399" text-anchor="middle" fill="#718096" font-size="8" font-weight="600">HTTPS</text>
+  <rect x="397" y="388" width="86" height="16" rx="8" fill="#edf2f7"/>
+  <text x="440" y="399" text-anchor="middle" fill="#718096" font-size="8" font-weight="600">secure connection</text>
 
   <!-- ROW 4: PURDUE BRIGHTSPACE -->
-  <rect x="240" y="424" width="400" height="58" rx="29" fill="url(#d2lGrad)" filter="url(#shadow)"/>
+  <rect x="240" y="424" width="400" height="58" rx="29" fill="url(#bsGrad)" filter="url(#shadow)"/>
   <text x="440" y="454" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" letter-spacing="0.3">Purdue Brightspace</text>
-  <text x="440" y="470" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9.5">LP API v1.56  ·  LE API v1.91  ·  Version Discovery</text>
+  <text x="440" y="470" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9.5">Your courses, grades, assignments, and more</text>
 
-  <!-- AUTH SIDEBAR -->
+  <!-- LOGIN SIDEBAR -->
   <rect x="16" y="170" width="76" height="302" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
-  <rect x="16" y="170" width="76" height="28" rx="12" fill="url(#authGrad)"/>
-  <rect x="16" y="188" width="76" height="10" fill="url(#authGrad)"/>
-  <text x="54" y="190" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">Auth CLI</text>
+  <rect x="16" y="170" width="76" height="28" rx="12" fill="url(#loginGrad)"/>
+  <rect x="16" y="188" width="76" height="10" fill="url(#loginGrad)"/>
+  <text x="54" y="190" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">Login</text>
+  <text x="54" y="162" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="7">(one-time setup)</text>
 
-  <text x="54" y="222" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Playwright</text>
-  <line x1="54" y1="228" x2="54" y2="246" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,242 54,250 58,242" fill="#e2e8f0"/>
+  <text x="54" y="226" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Opens</text>
+  <text x="54" y="238" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">browser</text>
+  <line x1="54" y1="244" x2="54" y2="260" stroke="#e2e8f0" stroke-width="1"/>
+  <polygon points="50,256 54,264 58,256" fill="#e2e8f0"/>
 
-  <text x="54" y="266" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Purdue SSO</text>
-  <line x1="54" y1="272" x2="54" y2="290" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,286 54,294 58,286" fill="#e2e8f0"/>
+  <text x="54" y="280" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Purdue</text>
+  <text x="54" y="292" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Login</text>
+  <line x1="54" y1="298" x2="54" y2="314" stroke="#e2e8f0" stroke-width="1"/>
+  <polygon points="50,310 54,318 58,310" fill="#e2e8f0"/>
 
-  <text x="54" y="308" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Duo MFA</text>
-  <line x1="54" y1="314" x2="54" y2="332" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,328 54,336 58,328" fill="#e2e8f0"/>
+  <text x="54" y="334" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Duo Push</text>
+  <line x1="54" y1="340" x2="54" y2="356" stroke="#e2e8f0" stroke-width="1"/>
+  <polygon points="50,352 54,360 58,352" fill="#e2e8f0"/>
 
-  <text x="54" y="350" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Extract</text>
-  <text x="54" y="362" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Tokens</text>
-  <line x1="54" y1="368" x2="54" y2="386" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,382 54,390 58,382" fill="#e2e8f0"/>
+  <text x="54" y="376" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Save</text>
+  <text x="54" y="388" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">session</text>
+  <line x1="54" y1="394" x2="54" y2="410" stroke="#e2e8f0" stroke-width="1"/>
+  <polygon points="50,406 54,414 58,406" fill="#e2e8f0"/>
 
-  <rect x="24" y="392" width="60" height="34" rx="8" fill="#fff5f5" stroke="#fed7d7" stroke-width="1"/>
-  <text x="54" y="408" text-anchor="middle" fill="#c53030" font-size="7.5" font-weight="700">AES-256-GCM</text>
-  <text x="54" y="420" text-anchor="middle" fill="#e53e3e" font-size="7">encrypted store</text>
+  <rect x="24" y="418" width="60" height="34" rx="8" fill="#fff5f5" stroke="#fed7d7" stroke-width="1"/>
+  <text x="54" y="434" text-anchor="middle" fill="#c53030" font-size="8" font-weight="600">Encrypted</text>
+  <text x="54" y="446" text-anchor="middle" fill="#e53e3e" font-size="7.5">on your computer</text>
 
-  <!-- Dashed arrow: Auth to MCP Server -->
+  <!-- Dashed arrow: Login to Plugin -->
   <line x1="92" y1="347" x2="170" y2="347" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.4"/>
   <polygon points="166,343 174,347 166,351" fill="#e53e3e" opacity="0.4"/>
-  <text x="131" y="340" text-anchor="middle" fill="#e53e3e" font-size="7.5" font-weight="500" opacity="0.6">tokens</text>
+  <text x="131" y="340" text-anchor="middle" fill="#e53e3e" font-size="7.5" font-weight="500" opacity="0.6">session</text>
 
   <!-- LEGEND -->
-  <g opacity="0.75">
-    <rect x="788" y="430" width="80" height="72" rx="8" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
-    <rect x="798" y="442" width="8" height="8" rx="4" fill="url(#clientGrad)"/>
-    <text x="812" y="450" fill="#4a5568" font-size="7.5">Client</text>
-    <rect x="798" y="456" width="8" height="8" rx="4" fill="url(#serverGrad)"/>
-    <text x="812" y="464" fill="#4a5568" font-size="7.5">Server</text>
-    <rect x="798" y="470" width="8" height="8" rx="4" fill="url(#apiGrad)"/>
-    <text x="812" y="478" fill="#4a5568" font-size="7.5">API Client</text>
-    <rect x="798" y="484" width="8" height="8" rx="4" fill="url(#authGrad)"/>
-    <text x="812" y="492" fill="#4a5568" font-size="7.5">Auth</text>
+  <g opacity="0.7">
+    <rect x="784" y="430" width="84" height="72" rx="8" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+    <rect x="794" y="442" width="8" height="8" rx="4" fill="url(#chatbotGrad)"/>
+    <text x="808" y="450" fill="#4a5568" font-size="7.5">Chatbot</text>
+    <rect x="794" y="456" width="8" height="8" rx="4" fill="url(#pluginGrad)"/>
+    <text x="808" y="464" fill="#4a5568" font-size="7.5">Plugin</text>
+    <rect x="794" y="470" width="8" height="8" rx="4" fill="url(#connectorGrad)"/>
+    <text x="808" y="478" fill="#4a5568" font-size="7.5">Connector</text>
+    <rect x="794" y="484" width="8" height="8" rx="4" fill="url(#loginGrad)"/>
+    <text x="808" y="492" fill="#4a5568" font-size="7.5">Login</text>
   </g>
 </svg>
