@@ -7,7 +7,7 @@ Access your Purdue Brightspace courses using natural language. Get grades, due d
 ## Architecture
 
 <p align="center">
-  <img src="docs/architecture.svg?v=2" alt="Architecture diagram" width="780">
+  <img src="docs/architecture.svg?v=3" alt="Architecture diagram" width="100%">
 </p>
 
 ## What You Can Do

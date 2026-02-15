@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 520" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 680" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
   <defs>
     <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.06"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.06"/>
     </filter>
     <linearGradient id="chatbotGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#667eea"/>
@@ -26,132 +26,135 @@
   </defs>
 
   <!-- ROW 1: AI CHATBOT -->
-  <rect x="260" y="24" width="360" height="58" rx="29" fill="url(#chatbotGrad)" filter="url(#shadow)"/>
-  <text x="440" y="54" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" letter-spacing="0.3">AI Chatbot</text>
-  <text x="440" y="70" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9.5">Claude Desktop  /  ChatGPT  /  Cursor  /  Claude Code</text>
+  <rect x="270" y="24" width="420" height="72" rx="36" fill="url(#chatbotGrad)" filter="url(#shadow)"/>
+  <text x="480" y="58" text-anchor="middle" fill="#fff" font-size="20" font-weight="700" letter-spacing="0.3">AI Chatbot</text>
+  <text x="480" y="80" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="12">Claude Desktop  /  ChatGPT  /  Cursor  /  Claude Code</text>
 
   <!-- Arrow 1 -->
-  <line x1="440" y1="82" x2="440" y2="122" stroke="#cbd5e0" stroke-width="1.5"/>
-  <polygon points="435,118 440,128 445,118" fill="#cbd5e0"/>
-  <rect x="404" y="94" width="72" height="16" rx="8" fill="#edf2f7"/>
-  <text x="440" y="105" text-anchor="middle" fill="#718096" font-size="8" font-weight="600">your question</text>
+  <line x1="480" y1="96" x2="480" y2="148" stroke="#cbd5e0" stroke-width="2"/>
+  <polygon points="474,143 480,155 486,143" fill="#cbd5e0"/>
+  <rect x="440" y="112" width="80" height="20" rx="10" fill="#edf2f7"/>
+  <text x="480" y="126" text-anchor="middle" fill="#718096" font-size="10" font-weight="600">your question</text>
 
   <!-- ROW 2: BRIGHTSPACE PLUGIN -->
-  <rect x="110" y="128" width="660" height="136" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
-  <rect x="110" y="128" width="660" height="34" rx="12" fill="url(#pluginGrad)"/>
-  <rect x="110" y="150" width="660" height="12" fill="url(#pluginGrad)"/>
-  <text x="440" y="151" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing="0.3">Brightspace Plugin</text>
-  <text x="440" y="162" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8">understands 11 types of questions about your courses</text>
+  <rect x="120" y="155" width="720" height="180" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="120" y="155" width="720" height="50" rx="14" fill="url(#pluginGrad)"/>
+  <rect x="120" y="190" width="720" height="15" fill="url(#pluginGrad)"/>
+  <text x="480" y="182" text-anchor="middle" fill="#fff" font-size="18" font-weight="700" letter-spacing="0.3">Brightspace Plugin</text>
+  <text x="480" y="200" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="11">understands 11 types of questions about your courses</text>
 
   <!-- Skill pills row 1 -->
-  <rect x="128" y="176" width="88" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="172" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Check Login</text>
+  <rect x="140" y="222" width="100" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="190" y="242" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Check Login</text>
 
-  <rect x="222" y="176" width="86" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="265" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">My Courses</text>
+  <rect x="248" y="222" width="100" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="298" y="242" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">My Courses</text>
 
-  <rect x="314" y="176" width="82" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="355" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">My Grades</text>
+  <rect x="356" y="222" width="96" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="404" y="242" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">My Grades</text>
 
-  <rect x="402" y="176" width="84" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="444" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Due Dates</text>
+  <rect x="460" y="222" width="96" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="508" y="242" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Due Dates</text>
 
-  <rect x="492" y="176" width="108" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="546" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Announcements</text>
+  <rect x="564" y="222" width="128" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="628" y="242" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Announcements</text>
 
-  <rect x="606" y="176" width="96" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="654" y="192" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Assignments</text>
+  <rect x="700" y="222" width="118" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="759" y="242" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Assignments</text>
 
   <!-- Skill pills row 2 -->
-  <rect x="128" y="208" width="110" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="183" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Course Content</text>
+  <rect x="140" y="262" width="130" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="205" y="282" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Course Content</text>
 
-  <rect x="244" y="208" width="106" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="297" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Download Files</text>
+  <rect x="278" y="262" width="126" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="341" y="282" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Download Files</text>
 
-  <rect x="356" y="208" width="72" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="392" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Roster</text>
+  <rect x="412" y="262" width="82" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="453" y="282" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Roster</text>
 
-  <rect x="434" y="208" width="76" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="472" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Syllabus</text>
+  <rect x="502" y="262" width="90" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="547" y="282" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Syllabus</text>
 
-  <rect x="516" y="208" width="108" height="24" rx="12" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
-  <text x="570" y="224" text-anchor="middle" fill="#22543d" font-size="9" font-weight="500">Class Emails</text>
+  <rect x="600" y="262" width="120" height="30" rx="15" fill="#f0fff4" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="660" y="282" text-anchor="middle" fill="#22543d" font-size="11" font-weight="500">Class Emails</text>
+
+  <!-- Subtitle row -->
+  <text x="480" y="322" text-anchor="middle" fill="#a0aec0" font-size="10">with input validation, caching, and rate limiting built in</text>
 
   <!-- Arrow 2 -->
-  <line x1="440" y1="264" x2="440" y2="304" stroke="#cbd5e0" stroke-width="1.5"/>
-  <polygon points="435,300 440,310 445,300" fill="#cbd5e0"/>
+  <line x1="480" y1="335" x2="480" y2="388" stroke="#cbd5e0" stroke-width="2"/>
+  <polygon points="474,383 480,395 486,383" fill="#cbd5e0"/>
 
   <!-- ROW 3: CONNECTOR -->
-  <rect x="170" y="310" width="540" height="64" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
-  <rect x="170" y="310" width="540" height="30" rx="12" fill="url(#connectorGrad)"/>
-  <rect x="170" y="330" width="540" height="10" fill="url(#connectorGrad)"/>
-  <text x="440" y="331" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing="0.3">Brightspace Connector</text>
+  <rect x="180" y="395" width="600" height="80" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="180" y="395" width="600" height="38" rx="14" fill="url(#connectorGrad)"/>
+  <rect x="180" y="420" width="600" height="13" fill="url(#connectorGrad)"/>
+  <text x="480" y="420" text-anchor="middle" fill="#fff" font-size="18" font-weight="700" letter-spacing="0.3">Brightspace Connector</text>
 
-  <text x="255" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Caching</text>
-  <text x="310" y="358" text-anchor="middle" fill="#cbd5e0" font-size="10">·</text>
-  <text x="375" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Speed Limits</text>
-  <text x="444" y="358" text-anchor="middle" fill="#cbd5e0" font-size="10">·</text>
-  <text x="530" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Session Management</text>
-  <text x="620" y="358" text-anchor="middle" fill="#cbd5e0" font-size="10">·</text>
-  <text x="670" y="358" text-anchor="middle" fill="#7b341e" font-size="10" font-weight="500">Security</text>
+  <text x="270" y="458" text-anchor="middle" fill="#7b341e" font-size="12" font-weight="500">Caching</text>
+  <text x="330" y="458" text-anchor="middle" fill="#cbd5e0" font-size="14">·</text>
+  <text x="400" y="458" text-anchor="middle" fill="#7b341e" font-size="12" font-weight="500">Speed Limits</text>
+  <text x="474" y="458" text-anchor="middle" fill="#cbd5e0" font-size="14">·</text>
+  <text x="568" y="458" text-anchor="middle" fill="#7b341e" font-size="12" font-weight="500">Session Management</text>
+  <text x="660" y="458" text-anchor="middle" fill="#cbd5e0" font-size="14">·</text>
+  <text x="710" y="458" text-anchor="middle" fill="#7b341e" font-size="12" font-weight="500">Security</text>
 
   <!-- Arrow 3 -->
-  <line x1="440" y1="374" x2="440" y2="418" stroke="#cbd5e0" stroke-width="1.5"/>
-  <polygon points="435,414 440,424 445,414" fill="#cbd5e0"/>
-  <rect x="397" y="388" width="86" height="16" rx="8" fill="#edf2f7"/>
-  <text x="440" y="399" text-anchor="middle" fill="#718096" font-size="8" font-weight="600">secure connection</text>
+  <line x1="480" y1="475" x2="480" y2="535" stroke="#cbd5e0" stroke-width="2"/>
+  <polygon points="474,530 480,542 486,530" fill="#cbd5e0"/>
+  <rect x="432" y="496" width="96" height="20" rx="10" fill="#edf2f7"/>
+  <text x="480" y="510" text-anchor="middle" fill="#718096" font-size="10" font-weight="600">secure connection</text>
 
   <!-- ROW 4: PURDUE BRIGHTSPACE -->
-  <rect x="240" y="424" width="400" height="58" rx="29" fill="url(#bsGrad)" filter="url(#shadow)"/>
-  <text x="440" y="454" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" letter-spacing="0.3">Purdue Brightspace</text>
-  <text x="440" y="470" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9.5">Your courses, grades, assignments, and more</text>
+  <rect x="250" y="542" width="460" height="72" rx="36" fill="url(#bsGrad)" filter="url(#shadow)"/>
+  <text x="480" y="578" text-anchor="middle" fill="#fff" font-size="20" font-weight="700" letter-spacing="0.3">Purdue Brightspace</text>
+  <text x="480" y="598" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="12">Your courses, grades, assignments, and more</text>
 
   <!-- LOGIN SIDEBAR -->
-  <rect x="16" y="170" width="76" height="302" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
-  <rect x="16" y="170" width="76" height="28" rx="12" fill="url(#loginGrad)"/>
-  <rect x="16" y="188" width="76" height="10" fill="url(#loginGrad)"/>
-  <text x="54" y="190" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">Login</text>
-  <text x="54" y="162" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="7">(one-time setup)</text>
+  <rect x="14" y="200" width="88" height="380" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="14" y="200" width="88" height="36" rx="14" fill="url(#loginGrad)"/>
+  <rect x="14" y="224" width="88" height="12" fill="url(#loginGrad)"/>
+  <text x="58" y="224" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Login</text>
+  <text x="58" y="250" text-anchor="middle" fill="#a0aec0" font-size="9" font-style="italic">one-time setup</text>
 
-  <text x="54" y="226" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Opens</text>
-  <text x="54" y="238" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">browser</text>
-  <line x1="54" y1="244" x2="54" y2="260" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,256 54,264 58,256" fill="#e2e8f0"/>
+  <text x="58" y="280" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">Opens</text>
+  <text x="58" y="296" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">browser</text>
+  <line x1="58" y1="304" x2="58" y2="326" stroke="#e2e8f0" stroke-width="1.5"/>
+  <polygon points="53,321 58,331 63,321" fill="#e2e8f0"/>
 
-  <text x="54" y="280" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Purdue</text>
-  <text x="54" y="292" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Login</text>
-  <line x1="54" y1="298" x2="54" y2="314" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,310 54,318 58,310" fill="#e2e8f0"/>
+  <text x="58" y="350" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">Purdue</text>
+  <text x="58" y="366" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">Login</text>
+  <line x1="58" y1="374" x2="58" y2="396" stroke="#e2e8f0" stroke-width="1.5"/>
+  <polygon points="53,391 58,401 63,391" fill="#e2e8f0"/>
 
-  <text x="54" y="334" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Duo Push</text>
-  <line x1="54" y1="340" x2="54" y2="356" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,352 54,360 58,352" fill="#e2e8f0"/>
+  <text x="58" y="420" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">Duo Push</text>
+  <line x1="58" y1="428" x2="58" y2="450" stroke="#e2e8f0" stroke-width="1.5"/>
+  <polygon points="53,445 58,455 63,445" fill="#e2e8f0"/>
 
-  <text x="54" y="376" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">Save</text>
-  <text x="54" y="388" text-anchor="middle" fill="#4a5568" font-size="9" font-weight="500">session</text>
-  <line x1="54" y1="394" x2="54" y2="410" stroke="#e2e8f0" stroke-width="1"/>
-  <polygon points="50,406 54,414 58,406" fill="#e2e8f0"/>
+  <text x="58" y="474" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">Save</text>
+  <text x="58" y="490" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">session</text>
+  <line x1="58" y1="498" x2="58" y2="520" stroke="#e2e8f0" stroke-width="1.5"/>
+  <polygon points="53,515 58,525 63,515" fill="#e2e8f0"/>
 
-  <rect x="24" y="418" width="60" height="34" rx="8" fill="#fff5f5" stroke="#fed7d7" stroke-width="1"/>
-  <text x="54" y="434" text-anchor="middle" fill="#c53030" font-size="8" font-weight="600">Encrypted</text>
-  <text x="54" y="446" text-anchor="middle" fill="#e53e3e" font-size="7.5">on your computer</text>
+  <rect x="22" y="530" width="72" height="40" rx="10" fill="#fff5f5" stroke="#fed7d7" stroke-width="1"/>
+  <text x="58" y="549" text-anchor="middle" fill="#c53030" font-size="10" font-weight="600">Encrypted</text>
+  <text x="58" y="564" text-anchor="middle" fill="#e53e3e" font-size="9">on your computer</text>
 
   <!-- Dashed arrow: Login to Plugin -->
-  <line x1="92" y1="347" x2="170" y2="347" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.4"/>
-  <polygon points="166,343 174,347 166,351" fill="#e53e3e" opacity="0.4"/>
-  <text x="131" y="340" text-anchor="middle" fill="#e53e3e" font-size="7.5" font-weight="500" opacity="0.6">session</text>
+  <line x1="102" y1="435" x2="180" y2="435" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
+  <polygon points="175,430 184,435 175,440" fill="#e53e3e" opacity="0.4"/>
+  <text x="141" y="426" text-anchor="middle" fill="#e53e3e" font-size="9" font-weight="500" opacity="0.6">session</text>
 
   <!-- LEGEND -->
   <g opacity="0.7">
-    <rect x="784" y="430" width="84" height="72" rx="8" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
-    <rect x="794" y="442" width="8" height="8" rx="4" fill="url(#chatbotGrad)"/>
-    <text x="808" y="450" fill="#4a5568" font-size="7.5">Chatbot</text>
-    <rect x="794" y="456" width="8" height="8" rx="4" fill="url(#pluginGrad)"/>
-    <text x="808" y="464" fill="#4a5568" font-size="7.5">Plugin</text>
-    <rect x="794" y="470" width="8" height="8" rx="4" fill="url(#connectorGrad)"/>
-    <text x="808" y="478" fill="#4a5568" font-size="7.5">Connector</text>
-    <rect x="794" y="484" width="8" height="8" rx="4" fill="url(#loginGrad)"/>
-    <text x="808" y="492" fill="#4a5568" font-size="7.5">Login</text>
+    <rect x="856" y="548" width="92" height="88" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+    <rect x="868" y="562" width="10" height="10" rx="5" fill="url(#chatbotGrad)"/>
+    <text x="884" y="572" fill="#4a5568" font-size="9">Chatbot</text>
+    <rect x="868" y="580" width="10" height="10" rx="5" fill="url(#pluginGrad)"/>
+    <text x="884" y="590" fill="#4a5568" font-size="9">Plugin</text>
+    <rect x="868" y="598" width="10" height="10" rx="5" fill="url(#connectorGrad)"/>
+    <text x="884" y="608" fill="#4a5568" font-size="9">Connector</text>
+    <rect x="868" y="616" width="10" height="10" rx="5" fill="url(#loginGrad)"/>
+    <text x="884" y="626" fill="#4a5568" font-size="9">Login</text>
   </g>
 </svg>
