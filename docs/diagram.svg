@@ -119,7 +119,7 @@
   <text x="870" y="323" text-anchor="middle" fill="#718096" font-size="12" font-weight="600">your answer</text>
 
   <!-- LOGIN SIDEBAR -->
-  <rect x="14" y="200" width="88" height="380" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="14" y="200" width="88" height="310" rx="14" fill="#fff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
   <rect x="14" y="200" width="88" height="36" rx="14" fill="url(#loginGrad)"/>
   <rect x="14" y="224" width="88" height="12" fill="url(#loginGrad)"/>
   <text x="58" y="224" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Login</text>
@@ -140,13 +140,6 @@
 
   <text x="58" y="474" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">Save</text>
   <text x="58" y="490" text-anchor="middle" fill="#4a5568" font-size="11" font-weight="500">session</text>
-  <line x1="58" y1="498" x2="58" y2="520" stroke="#e2e8f0" stroke-width="1.5"/>
-  <polygon points="53,515 58,525 63,515" fill="#e2e8f0"/>
-
-  <rect x="4" y="526" width="108" height="52" rx="12" fill="#fff5f5" stroke="#fed7d7" stroke-width="1"/>
-  <text x="58" y="550" text-anchor="middle" fill="#c53030" font-size="12" font-weight="600">Encrypted</text>
-  <text x="58" y="568" text-anchor="middle" fill="#e53e3e" font-size="11">on your computer</text>
-
   <!-- Dashed arrow: Login to Plugin -->
   <line x1="102" y1="435" x2="180" y2="435" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
   <polygon points="175,430 184,435 175,440" fill="#e53e3e" opacity="0.4"/>
