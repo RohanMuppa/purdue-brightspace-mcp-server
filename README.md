@@ -7,9 +7,7 @@ Access your Purdue Brightspace courses using natural language. Get grades, due d
 ## Architecture
 
 <p align="center">
-  <picture>
-    <img src="https://raw.githubusercontent.com/RohanMuppa/purdue-brightspace-mcp/main/docs/arch.svg" alt="Architecture diagram" width="100%">
-  </picture>
+  <img src="https://raw.githubusercontent.com/RohanMuppa/purdue-brightspace-mcp-server/main/docs/diagram.svg" alt="Architecture diagram" width="100%">
 </p>
 
 ## What You Can Do
