@@ -77,25 +77,31 @@ async function buildContentTree(
   modules: ContentObject[],
   progressMap: Map<number, ContentProgress>,
   typeFilter: string,
+  maxDepth?: number,
+  currentDepth: number = 0,
 ): Promise<any[]> {
   const tree = [];
 
   for (const item of modules) {
     if (item.Type === 0) {
-      // Module — fetch children recursively
-      let children: ContentObject[] = [];
-      try {
-        children = await apiClient.get<ContentObject[]>(
-          apiClient.le(courseId, `/content/modules/${item.Id}/structure/`),
-          { ttl: DEFAULT_CACHE_TTLS.courseContent }
-        );
-      } catch (e) {
-        log('DEBUG', `Failed to fetch children for module ${item.Id}: skipping`);
-      }
+      // Module — fetch children recursively (unless maxDepth reached)
+      let processedChildren: any[] = [];
 
-      const processedChildren = await buildContentTree(
-        apiClient, courseId, children, progressMap, typeFilter
-      );
+      if (maxDepth === undefined || currentDepth < maxDepth) {
+        let children: ContentObject[] = [];
+        try {
+          children = await apiClient.get<ContentObject[]>(
+            apiClient.le(courseId, `/content/modules/${item.Id}/structure/`),
+            { ttl: DEFAULT_CACHE_TTLS.courseContent }
+          );
+        } catch (e) {
+          log('DEBUG', `Failed to fetch children for module ${item.Id}: skipping`);
+        }
+
+        processedChildren = await buildContentTree(
+          apiClient, courseId, children, progressMap, typeFilter, maxDepth, currentDepth + 1
+        );
+      }
 
       // Only include module if it has matching children (or filter is 'all')
       if (typeFilter === 'all' || processedChildren.length > 0) {
@@ -198,7 +204,7 @@ export function registerGetCourseContent(
     {
       title: "Get Course Content",
       description:
-        "Fetch the content tree for a course showing modules, topics, files, and links. Use this when the user asks about course materials, lecture slides, uploaded files, content structure, or what's in a course module.",
+        "Fetch the content tree for a course showing modules, topics, files, and links. Use this when the user asks about course materials, lecture slides, uploaded files, content structure, or what's in a course module. Use moduleTitle to filter to a specific module (e.g. 'Labs', 'Staff', 'Homeworks') instead of fetching the entire tree. Use maxDepth to limit recursion depth for a table-of-contents view.",
       inputSchema: GetCourseContentSchema,
     },
     async (args: any) => {
@@ -206,13 +212,21 @@ export function registerGetCourseContent(
         log("DEBUG", "get_course_content tool called", { args });
 
         // Parse and validate input
-        const { courseId, typeFilter = 'all' } = GetCourseContentSchema.parse(args);
+        const { courseId, typeFilter = 'all', moduleTitle, maxDepth } = GetCourseContentSchema.parse(args);
 
         // Fetch root modules
-        const rootModules = await apiClient.get<ContentObject[]>(
+        let rootModules = await apiClient.get<ContentObject[]>(
           apiClient.le(courseId, '/content/root/'),
           { ttl: DEFAULT_CACHE_TTLS.courseContent }
         );
+
+        // Filter root modules by title if specified
+        if (moduleTitle) {
+          const searchTerm = moduleTitle.toLowerCase();
+          rootModules = rootModules.filter(m =>
+            m.Title.toLowerCase().includes(searchTerm)
+          );
+        }
 
         // Fetch user progress for the course (graceful degradation)
         let progressArray: ContentProgress[] = [];
@@ -240,7 +254,8 @@ export function registerGetCourseContent(
           courseId,
           rootModules,
           progressMap,
-          typeFilter
+          typeFilter,
+          maxDepth
         );
 
         const topicCount = countTopics(contentTree);

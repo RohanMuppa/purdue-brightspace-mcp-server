@@ -40,6 +40,10 @@ export const GetCourseContentSchema = z.object({
     .describe("Course ID to get content tree for."),
   typeFilter: z.enum(["file", "link", "html", "video", "all"]).default("all").optional()
     .describe("Optional filter to narrow results by content type."),
+  moduleTitle: z.string().optional()
+    .describe("Case-insensitive substring match on module titles. Only returns modules whose title contains this string (e.g. 'Labs', 'Staff', 'Homeworks'). Children of matching modules are included in full."),
+  maxDepth: z.number().int().min(1).max(10).optional()
+    .describe("Limit recursive depth of the content tree. Depth 1 returns top-level modules with direct children only. Useful for getting a table of contents without all nested content."),
 });
 
 export const GetClasslistEmailsSchema = z.object({
@@ -58,6 +62,8 @@ export const DownloadFileSchema = z.object({
     .describe("Specific file ID within a dropbox submission."),
   downloadPath: z.string().min(1)
     .describe("Absolute path to the directory where the file should be saved."),
+  customFilename: z.string().optional()
+    .describe("Custom filename for the downloaded file (include extension). If not provided, uses the original filename from Brightspace."),
 });
 
 export const GetSyllabusSchema = z.object({
@@ -65,6 +71,15 @@ export const GetSyllabusSchema = z.object({
     .describe("Course ID to get syllabus for."),
   downloadPath: z.string().min(1).optional()
     .describe("Absolute path to the directory where the attachment should be saved."),
+});
+
+export const GetDiscussionsSchema = z.object({
+  courseId: z.number().int().positive()
+    .describe("Course ID to get discussion boards for."),
+  forumId: z.number().int().positive().optional()
+    .describe("Specific forum ID to get topics and posts for. If omitted, returns all forums."),
+  topicId: z.number().int().positive().optional()
+    .describe("Specific topic ID to get posts for. Requires forumId."),
 });
 
 export const GetRosterSchema = z.object({
