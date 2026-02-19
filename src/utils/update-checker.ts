@@ -26,7 +26,7 @@ export function initUpdateChecker(): void {
         if (count > 0) {
           notice =
             `Update available (${count} new commit${count === 1 ? "" : "s"}). ` +
-            "Run `purdue-brightspace-update` in your terminal to update.";
+            "Run `brightspace-update` in your terminal to update.";
         }
       }
     );

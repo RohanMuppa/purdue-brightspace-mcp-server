@@ -1,13 +1,13 @@
-# Purdue Brightspace MCP Server
+# Brightspace MCP Server
 
 > **Created by [Rohan Muppa](https://github.com/rohanmuppa)**
 
-Access your Purdue Brightspace courses using natural language. Get grades, due dates, announcements, rosters, and more. Works with any MCP client (Claude Desktop, ChatGPT Desktop, Claude Code, Cursor, etc.).
+Access your Brightspace (D2L) courses using natural language. Get grades, due dates, announcements, rosters, and more — works with any Brightspace instance. Compatible with any MCP client (Claude Desktop, ChatGPT Desktop, Claude Code, Cursor, etc.).
 
 ## Architecture
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/RohanMuppa/purdue-brightspace-mcp-server/main/docs/how-it-works.svg" alt="Architecture diagram" width="100%">
+  <img src="https://raw.githubusercontent.com/RohanMuppa/brightspace-mcp-server/main/docs/how-it-works.svg" alt="Architecture diagram" width="100%">
 </p>
 
 ## What You Can Do
@@ -40,8 +40,8 @@ Access your Purdue Brightspace courses using natural language. Get grades, due d
 Open Terminal (Mac) or Command Prompt (Windows) and run:
 
 ```bash
-git clone https://github.com/RohanMuppa/purdue-brightspace-mcp.git
-cd purdue-brightspace-mcp
+git clone https://github.com/RohanMuppa/brightspace-mcp-server.git
+cd brightspace-mcp-server
 ```
 
 ### Step 2: Install dependencies
@@ -54,7 +54,7 @@ This will take about 1-2 minutes. It will also automatically install Chromium (u
 
 ### Step 3: Set up your credentials
 
-Copy the example environment file and fill in your Purdue credentials:
+Copy the example environment file and fill in your Brightspace credentials:
 
 **Mac/Linux:**
 ```bash
@@ -66,14 +66,15 @@ cp .env.example .env
 copy .env.example .env
 ```
 
-Then open `.env` in a text editor and replace the placeholders:
+Then open `.env` in a text editor and fill in:
 
 ```
-D2L_USERNAME=your_purdue_username
-D2L_PASSWORD=your_purdue_password
+D2L_BASE_URL=https://your-institution.brightspace.com
+D2L_USERNAME=your_username
+D2L_PASSWORD=your_password
 ```
 
-Use your Purdue career account username (not your email). Your credentials stay on your machine and are never sent anywhere except Purdue's login page.
+Set `D2L_BASE_URL` to your institution's Brightspace URL (e.g. `https://purdue.brightspace.com`). Use your institution's login username (not your email). Your credentials stay on your machine and are never sent anywhere except your institution's login page.
 
 ### Step 4: Build the project
 
@@ -89,12 +90,12 @@ This compiles the TypeScript code. It should complete in a few seconds.
 npm link
 ```
 
-This registers the `purdue-brightspace-auth` command globally so you can run it from anywhere.
+This registers the `brightspace-auth` command globally so you can run it from anywhere.
 
 ### Step 5: Authenticate with Brightspace
 
 ```bash
-purdue-brightspace-auth
+brightspace-auth
 ```
 
 Or if you prefer, you can also run it with npm:
@@ -105,7 +106,7 @@ npm run auth
 
 **What happens:**
 1. A browser window will open and log in automatically using your `.env` credentials
-2. Approve the Duo push notification on your phone
+2. Approve the MFA push notification on your phone (e.g. Duo)
 3. The browser will close automatically once authenticated
 
 **Note:** You only need to do this once. The session lasts about 1 hour. When it expires, just run `npm run auth` again.
@@ -125,15 +126,15 @@ Open the config file in a text editor and add this configuration (if the file do
 ```json
 {
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["/absolute/path/to/purdue-brightspace-mcp/build/index.js"]
+      "args": ["/absolute/path/to/brightspace-mcp-server/build/index.js"]
     }
   }
 }
 ```
 
-**Important:** Replace `/absolute/path/to/purdue-brightspace-mcp` with the actual path on your computer.
+**Important:** Replace `/absolute/path/to/brightspace-mcp-server` with the actual path on your computer.
 
 To find the path:
 - **Mac/Linux**: In Terminal, go to the project directory and run `pwd`
@@ -143,9 +144,9 @@ To find the path:
 ```json
 {
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["/Users/username/purdue-brightspace-mcp/build/index.js"]
+      "args": ["/Users/username/brightspace-mcp-server/build/index.js"]
     }
   }
 }
@@ -155,9 +156,9 @@ To find the path:
 ```json
 {
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["C:\\Users\\username\\purdue-brightspace-mcp\\build\\index.js"]
+      "args": ["C:\\Users\\username\\brightspace-mcp-server\\build\\index.js"]
     }
   }
 }
@@ -176,23 +177,23 @@ Create or open the config file and add this configuration:
 ```json
 {
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["/absolute/path/to/purdue-brightspace-mcp/build/index.js"]
+      "args": ["/absolute/path/to/brightspace-mcp-server/build/index.js"]
     }
   }
 }
 ```
 
-**Important:** Replace `/absolute/path/to/purdue-brightspace-mcp` with the actual path on your computer (use `pwd` on Mac/Linux or `cd` on Windows to find it).
+**Important:** Replace `/absolute/path/to/brightspace-mcp-server` with the actual path on your computer (use `pwd` on Mac/Linux or `cd` on Windows to find it).
 
 **Example (Mac):**
 ```json
 {
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["/Users/username/purdue-brightspace-mcp/build/index.js"]
+      "args": ["/Users/username/brightspace-mcp-server/build/index.js"]
     }
   }
 }
@@ -202,9 +203,9 @@ Create or open the config file and add this configuration:
 ```json
 {
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["C:\\Users\\username\\purdue-brightspace-mcp\\build\\index.js"]
+      "args": ["C:\\Users\\username\\brightspace-mcp-server\\build\\index.js"]
     }
   }
 }
@@ -224,17 +225,17 @@ ChatGPT Desktop configures MCP servers through its Settings UI, not a JSON file.
 3. Scroll down to find **"MCP Servers"** (may be under a Features or Tools section)
 4. Click **"Add Server"** (or similar button)
 5. Enter the following:
-   - **Server name**: `purdue-brightspace`
+   - **Server name**: `brightspace`
    - **Command**: `node`
-   - **Argument**: `/absolute/path/to/purdue-brightspace-mcp/build/index.js` (replace with your actual path)
+   - **Argument**: `/absolute/path/to/brightspace-mcp-server/build/index.js` (replace with your actual path)
 
 To find your path:
 - **Mac/Linux**: In Terminal, go to the project directory and run `pwd`
 - **Windows**: In Command Prompt, go to the project directory and run `cd`
 
 **Example paths:**
-- Mac: `/Users/username/purdue-brightspace-mcp/build/index.js`
-- Windows: `C:\Users\username\purdue-brightspace-mcp\build\index.js`
+- Mac: `/Users/username/brightspace-mcp-server/build/index.js`
+- Windows: `C:\Users\username\brightspace-mcp-server\build\index.js`
 
 **Note:** ChatGPT Desktop's MCP support may be in beta or rolling out gradually. If you don't see the MCP Servers option yet, check for app updates.
 
@@ -276,9 +277,9 @@ If you have a lot of courses and want to hide some, you can add course filters t
 ```json
 {
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["/absolute/path/to/purdue-brightspace-mcp/build/index.js"],
+      "args": ["/absolute/path/to/brightspace-mcp-server/build/index.js"],
       "env": {
         "D2L_INCLUDE_COURSES": "123456,789012",
         "D2L_EXCLUDE_COURSES": "111111,222222",
@@ -303,7 +304,7 @@ Your Brightspace session expires after about 1 hour. When it does, the server wi
 
 To log in again:
 ```bash
-purdue-brightspace-auth
+brightspace-auth
 ```
 
 You don't need to restart your MCP client after re-authenticating.
@@ -313,7 +314,7 @@ You don't need to restart your MCP client after re-authenticating.
 To update to the latest version:
 
 ```bash
-purdue-brightspace-update
+brightspace-update
 ```
 
 This pulls the latest code, installs any new dependencies, and rebuilds automatically. Restart your MCP client after updating.
@@ -321,7 +322,7 @@ This pulls the latest code, installs any new dependencies, and rebuilds automati
 ## Troubleshooting
 
 **"Not authenticated" error**
-- **Solution**: Run `purdue-brightspace-auth` (or `npm run auth` in the project directory). The browser will open and you'll log in again.
+- **Solution**: Run `brightspace-auth` (or `npm run auth` in the project directory). The browser will open and you'll log in again.
 
 **MCP client doesn't respond to Brightspace queries**
 - **Solution 1**: Restart your MCP client completely (quit and reopen, not just close the window).
@@ -333,12 +334,12 @@ This pulls the latest code, installs any new dependencies, and rebuilds automati
 
 **Authentication fails on Windows**
 - **Solution 1**: Make sure your `.env` file is in the project root directory (same folder as `package.json`) with your credentials filled in. The auth CLI reads credentials from this file.
-- **Solution 2**: Run `npm run auth` from the project directory (not `purdue-brightspace-auth` globally) to ensure the `.env` file is found.
+- **Solution 2**: Run `npm run auth` from the project directory (not `brightspace-auth` globally) to ensure the `.env` file is found.
 - **Solution 3**: If Chromium fails to install, run `npx playwright install chromium` manually.
 
 ## Security
 
-- Your Purdue credentials are never stored in this repository or in the code.
+- Your credentials are never stored in this repository or in the code.
 - Session tokens are encrypted using AES-256-GCM and stored in `~/.d2l-session/` (outside this project).
 - Token files have restricted permissions (only your user account can read them).
 - Tokens expire after about 1 hour for security.
@@ -356,4 +357,4 @@ AGPL-3.0-only — Copyright (c) 2026 Rohan Muppa
 
 **Rohan Muppa**
 GitHub: [@rohanmuppa](https://github.com/rohanmuppa)
-Project: [purdue-brightspace-mcp](https://github.com/rohanmuppa/purdue-brightspace-mcp)
+Project: [brightspace-mcp-server](https://github.com/rohanmuppa/brightspace-mcp-server)

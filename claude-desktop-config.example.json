@@ -1,15 +1,15 @@
 {
   "_comment": "Add this snippet to your Claude Desktop config file at ~/Library/Application Support/Claude/claude_desktop_config.json",
   "_instructions": [
-    "Replace /ABSOLUTE/PATH/TO/ with the actual path to your cloned purdue-brightspace-mcp repo",
+    "Replace /ABSOLUTE/PATH/TO/ with the actual path to your cloned brightspace-mcp-server repo",
     "The 'env' object is intentionally empty — no credentials belong in this file",
-    "Run 'purdue-brightspace-auth' first to authenticate before using with Claude Desktop",
+    "Run 'brightspace-auth' first to authenticate before using with Claude Desktop",
     "After adding this config, restart Claude Desktop to load the MCP server"
   ],
   "mcpServers": {
-    "purdue-brightspace": {
+    "brightspace": {
       "command": "node",
-      "args": ["/ABSOLUTE/PATH/TO/purdue-brightspace-mcp/build/index.js"],
+      "args": ["/ABSOLUTE/PATH/TO/brightspace-mcp-server/build/index.js"],
       "env": {}
     }
   }

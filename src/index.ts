@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Purdue Brightspace MCP Server
+ * Brightspace MCP Server
  * Copyright (c) 2025 Rohan Muppa. All rights reserved.
  * Licensed under AGPL-3.0 — see LICENSE file for details.
  *
- * https://github.com/rohanmuppa/purdue-brightspace-mcp
+ * https://github.com/rohanmuppa/brightspace-mcp-server
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -44,9 +44,9 @@ async function main(): Promise<void> {
 
     // Create MCP server instance
     const server = new McpServer({
-      name: "purdue-brightspace",
+      name: "brightspace",
       version: "1.0.0",
-      description: "Purdue Brightspace MCP Server by Rohan Muppa",
+      description: "Brightspace MCP Server by Rohan Muppa",
     });
     log("DEBUG", "MCP Server instance created");
 
@@ -82,8 +82,8 @@ async function main(): Promise<void> {
       {
         title: "Check Authentication Status",
         description:
-          "Check if you are authenticated with Purdue Brightspace. " +
-          "Run the purdue-brightspace-auth CLI first to authenticate. " +
+          "Check if you are authenticated with Brightspace. " +
+          "Run the brightspace-auth CLI first to authenticate. " +
           "Use this when the user asks if they're logged in, if authentication is working, " +
           "or when other tools return auth errors.",
       },
@@ -107,7 +107,7 @@ async function main(): Promise<void> {
               {
                 type: "text",
                 text: "Not authenticated. Auto-reauthentication was attempted but failed. " +
-                  "Please run `purdue-brightspace-auth` manually in your terminal to log in. " +
+                  "Please run `brightspace-auth` manually in your terminal to log in. " +
                   "Make sure your credentials in .env are correct and your internet connection is stable.",
               },
             ];
@@ -125,7 +125,7 @@ async function main(): Promise<void> {
         const content: Array<{ type: "text"; text: string }> = [
           {
             type: "text",
-            text: `Authenticated with Purdue Brightspace. Token expires in ~${expiresIn} minutes. Source: ${token.source}.`,
+            text: `Authenticated with Brightspace. Token expires in ~${expiresIn} minutes. Source: ${token.source}.`,
           },
         ];
         const notice = getUpdateNotice();
@@ -163,7 +163,7 @@ async function main(): Promise<void> {
     const transport = new StdioServerTransport();
     await server.connect(transport);
 
-    log("INFO", "Purdue Brightspace MCP Server by Rohan Muppa — running on stdio (12 tools registered)");
+    log("INFO", "Brightspace MCP Server by Rohan Muppa — running on stdio (12 tools registered)");
     log("INFO", "Setup: see README.md for MCP client configuration (Claude Desktop, ChatGPT Desktop, Cursor, etc.)");
   } catch (error) {
     log("ERROR", "MCP Server failed to start", error);

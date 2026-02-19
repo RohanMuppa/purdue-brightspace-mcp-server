@@ -1,13 +1,13 @@
 {
-  "name": "purdue-brightspace-mcp",
+  "name": "brightspace-mcp-server",
   "version": "1.0.0",
-  "description": "MCP server for Purdue Brightspace - by Rohan Muppa",
+  "description": "MCP server for Brightspace (D2L) — check grades, due dates, announcements, rosters & more via Claude, ChatGPT, Cursor, or any MCP client",
   "type": "module",
   "main": "build/index.js",
   "bin": {
-    "purdue-brightspace-mcp": "build/index.js",
-    "purdue-brightspace-auth": "build/auth-cli.js",
-    "purdue-brightspace-update": "build/update.js"
+    "brightspace-mcp-server": "build/index.js",
+    "brightspace-auth": "build/auth-cli.js",
+    "brightspace-update": "build/update.js"
   },
   "scripts": {
     "build": "tsc",
@@ -42,20 +42,26 @@
   },
   "license": "AGPL-3.0-only",
   "author": "Rohan Muppa",
-  "homepage": "https://github.com/rohanmuppa/purdue-brightspace-mcp",
+  "homepage": "https://github.com/rohanmuppa/brightspace-mcp-server",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rohanmuppa/purdue-brightspace-mcp.git"
+    "url": "https://github.com/rohanmuppa/brightspace-mcp-server.git"
   },
   "bugs": {
-    "url": "https://github.com/rohanmuppa/purdue-brightspace-mcp/issues"
+    "url": "https://github.com/rohanmuppa/brightspace-mcp-server/issues"
   },
   "keywords": [
     "mcp",
-    "purdue",
+    "mcp-server",
     "brightspace",
     "d2l",
+    "lms",
     "education",
+    "grades",
+    "courses",
+    "claude",
+    "chatgpt",
+    "cursor",
     "rohan-muppa"
   ]
 }
