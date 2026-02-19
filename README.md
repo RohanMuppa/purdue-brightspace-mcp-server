@@ -1,14 +1,16 @@
 # Brightspace MCP Server
 
-> **Created by [Rohan Muppa](https://github.com/rohanmuppa)**
+> **Created by [Rohan Muppa](https://github.com/rohanmuppa). ECE @ Purdue**
 
 Access your Brightspace (D2L) courses using natural language. Get grades, due dates, announcements, rosters, and more — works with any Brightspace instance. Compatible with any MCP client (Claude Desktop, ChatGPT Desktop, Claude Code, Cursor, etc.).
 
+Originally built for Purdue University's Brightspace, but works with any institution that uses D2L Brightspace as their LMS.
+
 ## Architecture
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/RohanMuppa/brightspace-mcp-server/main/docs/how-it-works.svg" alt="Architecture diagram" width="100%">
-</p>
+&lt;p align="center"&gt;
+  &lt;img src="https://raw.githubusercontent.com/RohanMuppa/brightspace-mcp-server/main/docs/how-it-works.svg" alt="Architecture diagram" width="100%"&gt;
+&lt;/p&gt;
 
 ## What You Can Do
 
@@ -74,7 +76,7 @@ D2L_USERNAME=your_username
 D2L_PASSWORD=your_password
 ```
 
-Set `D2L_BASE_URL` to your institution's Brightspace URL (e.g. `https://purdue.brightspace.com`). Use your institution's login username (not your email). Your credentials stay on your machine and are never sent anywhere except your institution's login page.
+Set `D2L_BASE_URL` to your institution's Brightspace URL. **Purdue students**: use `https://purdue.brightspace.com` and your Purdue career account username. Your credentials stay on your machine and are never sent anywhere except your institution's login page.
 
 ### Step 4: Build the project
 
@@ -106,7 +108,7 @@ npm run auth
 
 **What happens:**
 1. A browser window will open and log in automatically using your `.env` credentials
-2. Approve the MFA push notification on your phone (e.g. Duo)
+2. Approve the MFA push notification on your phone (Purdue students: approve the Duo push)
 3. The browser will close automatically once authenticated
 
 **Note:** You only need to do this once. The session lasts about 1 hour. When it expires, just run `npm run auth` again.
@@ -268,6 +270,16 @@ If it works, you'll see a list of your Brightspace courses!
 | `get_classlist_emails` | Get email addresses for instructors and TAs |
 | `get_roster` | Get course roster (instructors, TAs, optionally students) |
 
+## Purdue Quick Start
+
+If you're a Purdue student, here's the TL;DR:
+
+1. Clone, `npm install`, `npm run build`, `npm link`
+2. Copy `.env.example` to `.env`, set `D2L_BASE_URL=https://purdue.brightspace.com`, and add your Purdue career account credentials
+3. Run `brightspace-auth` and approve the Duo push
+4. Add the server to Claude Desktop / ChatGPT / Cursor (see config examples above)
+5. Ask "What are my courses?" and you're good to go
+
 ## Advanced Configuration
 
 ### Filter courses
@@ -355,6 +367,6 @@ AGPL-3.0-only — Copyright (c) 2026 Rohan Muppa
 
 ## Author
 
-**Rohan Muppa**
+**Rohan Muppa** — ECE @ Purdue University
 GitHub: [@rohanmuppa](https://github.com/rohanmuppa)
 Project: [brightspace-mcp-server](https://github.com/rohanmuppa/brightspace-mcp-server)
