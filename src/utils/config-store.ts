@@ -35,11 +35,12 @@ export function loadConfigStore(): ConfigStoreData {
 }
 
 export function saveConfigStore(config: ConfigStoreData): void {
+  const isWindows = process.platform === "win32";
   if (!fs.existsSync(CONFIG_DIR)) {
-    fs.mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
+    fs.mkdirSync(CONFIG_DIR, { recursive: true, ...(isWindows ? {} : { mode: 0o700 }) });
   }
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2) + "\n", {
-    mode: 0o600,
+    ...(isWindows ? {} : { mode: 0o600 }),
   });
 }
 
