@@ -26,6 +26,54 @@ export class BrowserAuth {
     });
   }
 
+  /**
+   * Detect if running inside WSL (Windows Subsystem for Linux) or Docker.
+   * These environments require --no-sandbox for Chromium to launch.
+   */
+  private static isWSLOrDocker(): boolean {
+    try {
+      // WSL: /proc/version contains "microsoft" or "WSL"
+      const procVersion = require("node:fs").readFileSync("/proc/version", "utf-8");
+      if (/microsoft|wsl/i.test(procVersion)) return true;
+    } catch {
+      // Not Linux or /proc not available
+    }
+    try {
+      // Docker: /.dockerenv exists or /proc/1/cgroup contains "docker"
+      require("node:fs").accessSync("/.dockerenv");
+      return true;
+    } catch {
+      // Not Docker
+    }
+    try {
+      const cgroup = require("node:fs").readFileSync("/proc/1/cgroup", "utf-8");
+      if (cgroup.includes("docker") || cgroup.includes("containerd")) return true;
+    } catch {
+      // Not in a container
+    }
+    return false;
+  }
+
+  /**
+   * Build Chromium launch args based on the current platform and environment.
+   */
+  private static buildChromiumArgs(): string[] {
+    const args = ["--disable-blink-features=AutomationControlled"];
+
+    if (process.platform === "win32") {
+      // Reduce GPU issues on Windows (common cause of rendering failures)
+      args.push("--disable-gpu");
+    }
+
+    if (BrowserAuth.isWSLOrDocker()) {
+      // WSL and Docker lack a proper sandboxing namespace — Chromium won't launch without this
+      args.push("--no-sandbox", "--disable-setuid-sandbox");
+      log("INFO", "Detected WSL/Docker environment — launching Chromium with --no-sandbox");
+    }
+
+    return args;
+  }
+
   async authenticate(): Promise<TokenData> {
     let context: BrowserContext | null = null;
 
@@ -45,11 +93,14 @@ export class BrowserAuth {
       // lock files persist and prevent all future auth attempts.
       await this.clearStaleLockFiles(browserDataDir);
 
-      context = await chromium.launchPersistentContext(browserDataDir, {
+      const launchOptions = {
         headless: this.config.headless,
-        viewport: { width: 1280, height: 720 },
-        args: ["--disable-blink-features=AutomationControlled"],
-      });
+        viewport: { width: 1280, height: 720 } as const,
+        args: BrowserAuth.buildChromiumArgs(),
+        timeout: 60000,
+      };
+
+      context = await this.launchBrowserWithRetry(browserDataDir, launchOptions);
 
       log("INFO", "Browser context launched");
 
@@ -181,14 +232,19 @@ export class BrowserAuth {
       const errMsg = error instanceof Error ? error.message : String(error);
       log("ERROR", "Browser authentication failed", error);
 
-      // Provide Windows-specific troubleshooting hints
+      // Provide platform-specific troubleshooting hints
       let hint = "";
       if (process.platform === "win32") {
         if (errMsg.includes("Target page, context or browser has been closed")) {
           hint = " (Windows hint: antivirus or firewall may be closing the browser. Try adding Chromium to your exclusion list.)";
         } else if (errMsg.includes("EPERM") || errMsg.includes("EACCES")) {
           hint = " (Windows hint: try running as Administrator, or check that no other process has locked the session directory.)";
+        } else if (errMsg.includes("Timeout") || errMsg.includes("timeout")) {
+          hint = " (Windows hint: browser launch timed out. Close all Chromium/Chrome instances in Task Manager and try again. Antivirus may also be blocking the launch.)";
         }
+      }
+      if (BrowserAuth.isWSLOrDocker() && (errMsg.includes("spawn") || errMsg.includes("ENOENT") || errMsg.includes("sandbox"))) {
+        hint = " (WSL/Docker hint: ensure Chromium dependencies are installed. Run: npx playwright install-deps chromium)";
       }
 
       throw new BrowserAuthError(
@@ -580,6 +636,40 @@ export class BrowserAuth {
       log("DEBUG", `Storage state saved to ${storageStatePath}`);
     } catch (error) {
       log("WARN", "Failed to save storage state", error);
+    }
+  }
+
+  /**
+   * Launch browser with retry logic.
+   * Windows is prone to 180s launch timeouts (Playwright issue #22117) caused by
+   * lingering Chromium processes, antivirus interference, or resource contention.
+   * On timeout, we clear lock files and retry once.
+   */
+  private async launchBrowserWithRetry(
+    browserDataDir: string,
+    options: {
+      headless: boolean;
+      viewport: { readonly width: number; readonly height: number };
+      args: string[];
+      timeout: number;
+    }
+  ): Promise<BrowserContext> {
+    try {
+      return await chromium.launchPersistentContext(browserDataDir, options);
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      const isTimeout = errMsg.includes("Timeout") || errMsg.includes("timeout");
+
+      if (isTimeout) {
+        log("WARN", "Browser launch timed out — clearing lock files and retrying");
+        await this.clearStaleLockFiles(browserDataDir);
+        return await chromium.launchPersistentContext(browserDataDir, {
+          ...options,
+          timeout: 90000, // More generous timeout on retry
+        });
+      }
+
+      throw error;
     }
   }
 

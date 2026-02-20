@@ -65,6 +65,12 @@ npx brightspace-mcp-server auth
 
 **Config location** → `~/.brightspace-mcp/config.json` (you can edit this directly)
 
+**Browser launch times out (Windows)** → Open Task Manager, end all Chromium/Chrome processes, and try again. If it persists, add the Playwright Chromium folder to your antivirus exclusion list.
+
+**Auth fails in WSL or Docker** → Chromium dependencies may be missing. Run `npx playwright install-deps chromium` to install them. The server automatically adds `--no-sandbox` for these environments.
+
+**Headless login fails (Windows)** → SSO login flows can fail in headless mode on Windows. The default is headed (a browser window opens). If you set `D2L_HEADLESS=true` and auth fails, switch back to headed mode.
+
 ## Security
 
 - Credentials stay on your machine at `~/.brightspace-mcp/config.json` (restricted permissions)
