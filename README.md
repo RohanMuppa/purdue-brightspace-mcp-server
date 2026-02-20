@@ -15,7 +15,7 @@ Works with any school that uses Brightspace.
 > "Download my lecture slides and turn them into interactive flashcards"
 > "Grab every assignment rubric and build me a visual dashboard of what I need to hit for an A"
 
-## Get Started
+## Steps To Install and Use
 
 **You need:** [Node.js 18+](https://nodejs.org/) (download the LTS version)
 
@@ -30,6 +30,8 @@ npx brightspace-mcp-server setup
 ```
 
 The wizard handles everything: credentials, MFA, and configuring your AI client. When it's done, restart Claude/ChatGPT/Cursor and start asking questions.
+
+That's it! You're ready to go.
 
 ## Session Expired?
 
