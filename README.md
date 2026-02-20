@@ -45,14 +45,13 @@ npx brightspace-mcp-server auth
 
 | Topic | Examples |
 |-------|---------|
-| Courses | "What are my courses?" |
-| Grades | "What's my grade in CS 252?" |
-| Assignments | "What's due this week?" |
-| Announcements | "Any new announcements?" |
-| Content | "Show me Module 3 files" |
-| Downloads | "Download the syllabus" |
-| Roster | "Who teaches this class?" |
-| Discussions | "Show recent discussion posts" |
+| Grades | "Am I passing all my classes?" · "Compare my grades across all courses" |
+| Assignments | "What's due in the next 48 hours?" · "Summarize every assignment I haven't turned in yet" |
+| Announcements | "Did any professor post something important today?" · "What did my CS prof announce this week?" |
+| Course content | "Find the midterm review slides" · "Download every PDF from Module 5" |
+| Roster | "Who are the TAs for ECE 264?" · "Get me my instructor's email" |
+| Discussions | "What are people saying in the final project thread?" · "Summarize the latest discussion posts" |
+| Planning | "Build me a study schedule based on my upcoming due dates" · "Which class needs the most attention right now?" |
 
 ## Troubleshooting
 
