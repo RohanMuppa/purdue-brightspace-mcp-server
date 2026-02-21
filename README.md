@@ -31,6 +31,8 @@ npx brightspace-mcp-server setup --purdue
 npx brightspace-mcp-server setup
 ```
 
+This command might take a few minutes to download, especially on Windows. Please be patient.
+
 The wizard handles everything: credentials, MFA, and configuring your AI client. When it's done, restart Claude/ChatGPT/Cursor and start asking questions.
 
 That's it! You're ready to go.
