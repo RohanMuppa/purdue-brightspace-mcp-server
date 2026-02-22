@@ -70,6 +70,14 @@ claude mcp add brightspace -- npx -y brightspace-mcp-server@latest
 }
 ```
 
+**ChatGPT Desktop** (Settings → Tools → Add MCP tool → "Add manually"):
+```json
+{
+  "command": "npx",
+  "args": ["-y", "brightspace-mcp-server@latest"]
+}
+```
+
 **Cursor** (`~/.cursor/mcp.json`):
 ```json
 {
