@@ -17,134 +17,63 @@ Works with any school that uses D2L Brightspace, including Purdue, USC, and hund
 > "Download my lecture slides and turn them into interactive flashcards"
 > "Grab every assignment rubric and build me a visual dashboard of what I need to hit for an A"
 
-## Steps to Install
+## Install
 
 **You need:** [Node.js 18+](https://nodejs.org/) (download the LTS version)
 
-**Purdue students:**
-```bash
-npx brightspace-mcp-server setup --purdue
+**Option 1: Let your AI do it**
+
+Paste this into Claude Code, Cursor chat, Windsurf, Copilot, Codex, or any AI coding assistant:
+
+```
+I want to connect my Brightspace LMS to this AI client using the brightspace-mcp-server package on npm. Here's the repo: https://github.com/RohanMuppa/brightspace-mcp-server
+
+Do everything needed to get it working:
+
+1. First, check if Node.js 18+ is installed. If not, tell me how to install it and stop.
+
+2. Run the setup wizard to save my Brightspace credentials:
+   npx brightspace-mcp-server setup
+   (If I'm a Purdue student, use: npx brightspace-mcp-server setup --purdue)
+   This will open a browser for login and MFA. Let me complete that before continuing.
+
+3. After setup finishes, configure this AI client to use the MCP server.
+   The server command is: npx -y brightspace-mcp-server@latest
+   Search the internet for how to configure MCP servers in general for
+   whatever client I'm using. Every client has a different config format
+   and file path. On Windows, npx must be wrapped with cmd /c.
+
+4. Tell me to restart this AI client so it picks up the new MCP server.
 ```
 
-**Everyone else:**
+**Option 2: Run it yourself**
+
 ```bash
 npx brightspace-mcp-server setup
 ```
 
-This command might take a few minutes to download, especially on Windows. Please be patient.
+Purdue students can add `--purdue` to skip entering the school URL:
 
-The wizard handles everything: credentials, MFA, and configuring your AI client. When it's done, restart Claude/Cursor and start asking questions.
-
-That's it! You're ready to go.
-
-## Manual Configuration
-
-The setup wizard auto-configures Claude Desktop and Cursor. For other clients, add the server manually:
-
-> **💡 Tip:** Already using Claude Code, Codex, or another AI coding assistant? Just paste this GitHub link and ask it to configure the Brightspace MCP for you: `https://github.com/RohanMuppa/brightspace-mcp-server`
-
-**Claude Code (CLI):**
 ```bash
-claude mcp add brightspace -- npx -y brightspace-mcp-server@latest
+npx brightspace-mcp-server setup --purdue
 ```
 
-**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json` on Mac, `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
+The wizard walks you through login, MFA, and auto configures Claude Desktop and Cursor. Restart your AI client when it finishes.
 
-Mac/Linux:
-```json
-{
-  "mcpServers": {
-    "brightspace": {
-      "command": "npx",
-      "args": ["-y", "brightspace-mcp-server@latest"]
-    }
-  }
-}
+<details>
+<summary>Using a different client? Configure it manually.</summary>
+
+Search your client's docs for how to add an MCP server. The server command to register is:
+
+```
+npx -y brightspace-mcp-server@latest
 ```
 
-Windows:
-```json
-{
-  "mcpServers": {
-    "brightspace": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "brightspace-mcp-server@latest"]
-    }
-  }
-}
-```
+On **Windows**, npx must be wrapped: `cmd /c npx -y brightspace-mcp-server@latest`
 
-**ChatGPT Desktop** (Settings → Tools → Add MCP tool → "Add manually"):
+You still need to run `npx brightspace-mcp-server setup` first to save your credentials.
 
-Mac/Linux:
-```json
-{
-  "command": "npx",
-  "args": ["-y", "brightspace-mcp-server@latest"]
-}
-```
-
-Windows:
-```json
-{
-  "command": "cmd",
-  "args": ["/c", "npx", "-y", "brightspace-mcp-server@latest"]
-}
-```
-
-**Cursor** (`~/.cursor/mcp.json`):
-
-Mac/Linux:
-```json
-{
-  "mcpServers": {
-    "brightspace": {
-      "command": "npx",
-      "args": ["-y", "brightspace-mcp-server@latest"]
-    }
-  }
-}
-```
-
-Windows:
-```json
-{
-  "mcpServers": {
-    "brightspace": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "brightspace-mcp-server@latest"]
-    }
-  }
-}
-```
-
-**Windsurf** (`~/.windsurf/mcp.json`):
-
-Mac/Linux:
-```json
-{
-  "mcpServers": {
-    "brightspace": {
-      "command": "npx",
-      "args": ["-y", "brightspace-mcp-server@latest"]
-    }
-  }
-}
-```
-
-Windows:
-```json
-{
-  "mcpServers": {
-    "brightspace": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "brightspace-mcp-server@latest"]
-    }
-  }
-}
-```
-
-After adding, restart your AI client. You still need to run `npx brightspace-mcp-server setup` first to save your credentials.
+</details>
 
 ## Session Expired?
 
