@@ -148,3 +148,8 @@ If you ever suspect you're on an old version, run `npm cache clean --force` to c
 Proudly made for Boilermakers by [Rohan Muppa](https://github.com/rohanmuppa) 🚂
 
 [Report a bug](https://github.com/rohanmuppa/brightspace-mcp-server/issues) · AGPL-3.0 · Copyright 2026 Rohan Muppa
+
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/rohanmuppa-brightspace-mcp-server).
+
