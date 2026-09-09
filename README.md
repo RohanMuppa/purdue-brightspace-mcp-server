@@ -50,7 +50,7 @@ you're at and skips SUNY's campus picker when you sign in:
 npx brightspace-mcp-server setup --suny
 ```
 
-The wizard saves your password in the native credential store and runs login in a headless browser. At Purdue, approve Microsoft Authenticator using the number printed in the terminal. No browser window opens. The wizard can configure Claude Desktop and Cursor. Restart your AI client when it finishes.
+The wizard saves your password in the native credential store and asks how you complete MFA. Choose background authentication for approval or number matching, or visible-browser authentication when you must enter a code from Google Authenticator, SMS, email, or another source. The wizard can configure Claude Desktop and Cursor. Restart your AI client when it finishes.
 
 Any other D2L school: run `setup` without a flag and paste your Brightspace URL (for example `https://yourschool.brightspace.com`).
 
@@ -71,7 +71,7 @@ You still need to run `npx brightspace-mcp-server setup` first to save your cred
 
 ## Session Expired?
 
-Returning the next day normally requires no action. The server renews short-lived API tokens over HTTPS using the saved Brightspace session. If that session ends, a headless browser restores your saved Microsoft session and tries silent SSO. If Microsoft requires sign-in, your saved credentials are entered automatically and you complete MFA on your phone.
+Returning the next day normally requires no action. The server renews short-lived API tokens over HTTPS using the saved Brightspace session. If that session ends, a browser restores your saved Microsoft session and tries silent SSO. It stays hidden for approval-based MFA and opens when setup is configured for interactive MFA.
 
 Your school's policy controls when MFA is required. There is no local 24-hour cutoff, and the server no longer discards browser state after one hour. A network outage preserves the saved session and returns a temporary error.
 
@@ -81,7 +81,7 @@ If you miss an MFA request, automatic browser authentication waits four hours be
 npx brightspace-mcp-server auth
 ```
 
-**MFA at Purdue** is Microsoft Authenticator number matching: enter the terminal-displayed number on your phone. The MCP also sends authentication progress as logging notifications to clients that display them. Some desktop clients hide server logs, so use the terminal command above if the number is not visible. Unsupported identity-provider pages require a supported sign-in handler; the server does not silently open a visible browser.
+**MFA at Purdue** commonly uses Microsoft Authenticator number matching: enter the terminal-displayed number on your phone. If your account instead requires a code or another browser interaction, rerun setup and choose option 2. The MCP also sends authentication progress as logging notifications to clients that display them. Some desktop clients hide server logs, so use the terminal command above if the number is not visible.
 
 ## What You Can Ask About
 

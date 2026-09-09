@@ -104,7 +104,7 @@ export class BrowserAuth {
       const args = ["--disable-blink-features=AutomationControlled"];
       if (BrowserAuth.isWSLOrDocker()) args.push("--no-sandbox", "--disable-setuid-sandbox");
       // Use Playwright's own timeout, which cleans up an unsuccessful launch.
-      browser = await chromium.launch({ headless: true, timeout: 60000, args });
+      browser = await chromium.launch({ headless: this.config.headless, timeout: 60000, args });
       process.once("SIGINT", closeOnSignal);
       process.once("SIGTERM", closeOnSignal);
       context = await browser.newContext({ viewport: { width: 1280, height: 720 }, storageState: state });

@@ -43,7 +43,7 @@ const SCHOOL_PRESETS: Record<string, SchoolPreset> = {
     name: "Purdue University",
     baseUrl: "https://purdue.brightspace.com",
     usernameLabel: "Purdue career account username or full email",
-    mfaNote: "Approve the sign-in in Microsoft Authenticator. The number is printed here; no browser window opens.",
+    mfaNote: "Microsoft Authenticator number matching can run without a browser window.",
   },
   suny: {
     name: "SUNY",
@@ -391,12 +391,26 @@ async function main(): Promise<void> {
     console.log(dim("  MFA: You will be prompted to approve the sign-in on your phone during auth."));
   }
   console.log("");
+  console.log("  How do you complete MFA?");
+  console.log("    1. Approve a notification or enter a displayed number on another device");
+  console.log("    2. Enter a code or complete another step in the sign-in page");
+  let mfaChoice = "";
+  while (!/^[12]$/.test(mfaChoice)) {
+    mfaChoice = await ask(rl2, "  Choose 1 or 2 [1]: ") || "1";
+    if (!/^[12]$/.test(mfaChoice)) console.log(yellow("  Please enter 1 or 2."));
+  }
+  const headless = mfaChoice === "1";
+  console.log(dim(headless
+    ? "  Authentication will run without a browser window."
+    : "  A browser window will open when authentication is needed."));
+  console.log("");
 
   // ── Step 5: Save config ──────────────────────────────────────────
   const config: ConfigStoreData = {
     baseUrl,
     username,
     password,
+    headless,
   };
   if (campus) {
     config.campus = campus;

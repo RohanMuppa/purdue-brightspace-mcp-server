@@ -18,7 +18,9 @@ async function main(): Promise<void> {
   try {
     const config = await loadConfig();
     console.error(`\n=== Brightspace Authentication v${pkg.version} ===\n`);
-    console.error("Authentication runs headlessly. If Microsoft requests MFA, the number appears here.");
+    console.error(config.headless
+      ? "Authentication runs headlessly. If Microsoft requests MFA, the number appears here."
+      : "Authentication opens a browser so you can complete MFA in the sign-in page.");
 
     const tokenManager = new TokenManager({
       sessionDir: config.sessionDir,

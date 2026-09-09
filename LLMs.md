@@ -46,7 +46,7 @@ npx brightspace-mcp-server setup --suny
 The wizard:
 
 - prompts for the school's Brightspace URL (skipped with `--purdue` or `--suny`)
-- runs a headless Chromium login and prints Microsoft Authenticator number matches in the terminal
+- asks whether MFA can run in the background or needs a visible browser, then authenticates accordingly
 - saves the password in the native credential store and public settings in `~/.brightspace-mcp/config.json` (0600)
 - writes the encrypted session below `~/.d2l-session/accounts/<account-hash>/` (AES-256-GCM)
 - auto-configures Claude Desktop and Cursor if detected
@@ -71,7 +71,7 @@ Tell the user to fully quit and reopen their AI client so it picks up the new MC
 
 ## Re-auth
 
-Access tokens are re-minted from the stored session cookie without a browser. A headless browser restores encrypted state for silent SSO when required, then enters saved credentials if Microsoft needs a full login. Missed MFA pauses automatic browser authentication, including SSO redirects, for four hours to prevent repeated phone prompts. HTTP token renewal remains allowed; the explicit command below bypasses the browser cooldown. Forward the MFA number to the user as it appears and wait for phone approval. Clients may hide server logs, so a terminal is the reliable place to see the number. Network errors and locked native storage should be reported without retrying MFA.
+Access tokens are re-minted from the stored session cookie without a browser. When browser authentication is required, setup's MFA choice controls whether Chromium stays hidden for approval-based MFA or opens for code entry and other interaction. Missed MFA pauses automatic browser authentication, including SSO redirects, for four hours to prevent repeated phone prompts. HTTP token renewal remains allowed; the explicit command below bypasses the browser cooldown. Forward any MFA number to the user as it appears and wait for completion. Clients may hide server logs, so a terminal is the reliable place to see the number. Network errors and locked native storage should be reported without retrying MFA.
 
 ```bash
 npx brightspace-mcp-server auth
