@@ -11,7 +11,7 @@ import * as readline from "node:readline";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import { execFile } from "node:child_process";
+import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { getConfigStorePath } from "./utils/config-store.js";
 import { saveSecureConfig } from "./utils/secure-config.js";
@@ -265,20 +265,16 @@ function runAuth(): Promise<boolean> {
   const scriptPath = path.resolve(thisDir, "auth-cli.js");
 
   return new Promise((resolve) => {
-    const child = execFile(
+    const child = spawn(
       process.execPath,
       [scriptPath],
       {
-        timeout: 8 * 60 * 1000,
         env: { ...process.env },
-      },
-      (error) => {
-        resolve(!error);
+        stdio: "inherit",
       },
     );
-    // Pipe child output so the user sees the auth flow
-    child.stdout?.pipe(process.stdout);
-    child.stderr?.pipe(process.stderr);
+    child.once("error", () => resolve(false));
+    child.once("close", (code) => resolve(code === 0));
   });
 }
 
@@ -379,7 +375,7 @@ async function main(): Promise<void> {
   console.log("");
 
   // Re-open readline for remaining prompts
-  const rl2 = readline.createInterface({
+  let rl2 = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
@@ -393,13 +389,14 @@ async function main(): Promise<void> {
   console.log("");
   console.log("  How do you complete MFA?");
   console.log("    1. Approve a notification or enter a displayed number on another device");
-  console.log("    2. Enter a code or complete another step in the sign-in page");
+  console.log("    2. Enter a code from an authenticator app in this terminal");
+  console.log("    3. Complete MFA in a visible browser window");
   let mfaChoice = "";
-  while (!/^[12]$/.test(mfaChoice)) {
-    mfaChoice = await ask(rl2, "  Choose 1 or 2 [1]: ") || "1";
-    if (!/^[12]$/.test(mfaChoice)) console.log(yellow("  Please enter 1 or 2."));
+  while (!/^[123]$/.test(mfaChoice)) {
+    mfaChoice = await ask(rl2, "  Choose 1, 2, or 3 [1]: ") || "1";
+    if (!/^[123]$/.test(mfaChoice)) console.log(yellow("  Please enter 1, 2, or 3."));
   }
-  const headless = mfaChoice === "1";
+  const headless = mfaChoice !== "3";
   console.log(dim(headless
     ? "  Authentication will run without a browser window."
     : "  A browser window will open when authentication is needed."));
@@ -424,10 +421,12 @@ async function main(): Promise<void> {
   // ── Step 6: Authenticate now? ────────────────────────────────────
   const authNow = await ask(rl2, "Would you like to authenticate now? (yes/no): ");
   if (/^y(es)?$/i.test(authNow)) {
+    rl2.close();
     console.log("");
     console.log(dim("  Starting authentication..."));
     console.log("");
     const ok = await runAuth();
+    rl2 = readline.createInterface({ input: process.stdin, output: process.stdout });
     if (ok) {
       console.log(green("\n  Authentication successful!"));
     } else {

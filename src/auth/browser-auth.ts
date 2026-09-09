@@ -12,6 +12,7 @@ import { BrowserAuthError } from "../utils/errors.js";
 import { log } from "../utils/logger.js";
 import { createSSOFlow, UnsupportedAuthenticationError, MfaApprovalError } from "./sso-flow.js";
 import type { SSOFlow } from "./sso-flow.js";
+import type { RequestMfaCode } from "./sso-flow.js";
 import { BrowserStateStore } from "./browser-state-store.js";
 import { acquireProcessLock } from "./auth-lock.js";
 import { AuthCooldown } from "./auth-cooldown.js";
@@ -50,9 +51,9 @@ export class BrowserAuth {
   private readonly stateStore: BrowserStateStore;
   private readonly cooldown: AuthCooldown;
 
-  constructor(config: AppConfig) {
+  constructor(config: AppConfig, requestMfaCode?: RequestMfaCode) {
     this.config = config;
-    this.ssoFlow = createSSOFlow(config);
+    this.ssoFlow = createSSOFlow(config, requestMfaCode);
     this.stateStore = new BrowserStateStore(config.sessionDir);
     this.cooldown = new AuthCooldown(config.sessionDir);
   }
