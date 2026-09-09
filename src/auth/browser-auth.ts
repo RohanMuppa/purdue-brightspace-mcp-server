@@ -140,7 +140,7 @@ export class BrowserAuth {
       }
       if (!token) throw new BrowserAuthError("Brightspace did not provide a usable API token. Saved SSO cookies have been preserved.", "token_extraction");
       if (interrupted) throw new BrowserAuthError("Authentication interrupted", "interrupted");
-      log("INFO", "Headless authentication complete");
+      log("INFO", "Browser authentication complete");
       return { ...token, ...material, tenantOrigin: new URL(this.config.baseUrl).origin };
     } finally {
       process.removeListener("SIGINT", closeOnSignal);
